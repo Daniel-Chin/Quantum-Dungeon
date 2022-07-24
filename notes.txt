@@ -1,0 +1,8 @@
+WFC
+    ? nonlocal
+
+Story
+    First, you have an item, reality scrambler. 
+        Using it will consume heat, but scrambles dungeon. 
+        Then you toss it into lava. 
+        That's how the main game begins. 
