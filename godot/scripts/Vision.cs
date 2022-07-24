@@ -3,37 +3,93 @@ using System;
 using System.Collections.Generic;
 
 public class Vision {
-    private class Point {
+    enum Quadrant {
+        A, B, C, D, XPos, XNeg, YPos, YNeg, Origin
+    }
+    private class Orientation {
+        // Cannot be (0, 0)
         public int X;
         public int Y;
-        private double? Rad = null;
-        public double GetRad(double eyeX, double eyeY) {
-            if (Rad is double valRad) {
-                return valRad;
+        public Quadrant GetQuadrant() {
+            if (X == 0) {
+                if (Y == 0) {
+                    return Quadrant.Origin;
+                } else if (Y < 0) {
+                    return Quadrant.YNeg;
+                } else {
+                    return Quadrant.YPos;
+                }
+            } else if (X < 0) {
+                if (Y == 0) {
+                    return Quadrant.XNeg;
+                } else if (Y < 0) {
+                    return Quadrant.C;
+                } else {
+                    return Quadrant.B;
+                }
             } else {
-                Rad = Math.Atan2(Y - eyeY, X - eyeX);
-                return (double) Rad;
+                if (Y == 0) {
+                    return Quadrant.XPos;
+                } else if (Y < 0) {
+                    return Quadrant.D;
+                } else {
+                    return Quadrant.A;
+                }
             }
         }
+        // public enum C {
+        //     LESS, EQUAL, GREAT
+        // }
+        // public C Compare(Orientation that) {
+        //     int result = X * that.Y - Y * that.X;
+        //     if (result == 0) {
+        //         return C.EQUAL;
+        //     } else if (result < 0) {
+        //         return C.LESS;
+        //     } else {
+        //         return C.GREAT;
+        //     }
+        // }
     }
-    private interface Arc {
-        double MidRad(double eyeX, double eyeY);
+    private class Arc {
+        // Can be neither 0 nor 2 * PI. 
+        public Orientation Start;
+        public Orientation End;
     }
-    private class FullArc : Arc {
-        public double MidRad(double eyeX, double eyeY) {
-            return 0;
+    private class ArcSet {
+        bool IsFull;
+        public List<Arc> Arcs;
+        public ArcSet() {
+            IsFull = true;
+            Arcs = new List<Arc>();
         }
-    }
-    private class NiceArc : Arc {
-        // Cannot be an empty arc
-        public Point Start;
-        public Point End;
-        public double MidRad(double eyeX, double eyeY) {
-            double x = Global.random.NextDouble();
-            return (
-                Start.GetRad(eyeX, eyeY) * x
-                + End.GetRad(eyeX, eyeY) * (1 - x)
-            );
+        public bool IsEmpty() {
+            return ! IsFull && Arcs.Count == 0;
+        }
+        public Orientation Sample() {
+            if (IsFull) {
+                return new Orientation() {X=1, Y=0};
+            } else {
+                Orientation start = Arcs[0].Start;
+                Orientation end   = Arcs[0].End;
+                if (
+                    start.X * end.Y <= 
+                    start.Y * end.X
+                ) {
+                    start = new Orientation() {
+                        X = - start.Y, 
+                        Y = + start.X, 
+                    };
+                    end   = new Orientation() {
+                        X = +   end.Y, 
+                        Y = -   end.X, 
+                    };
+                }
+                return new Orientation() {
+                    X = start.X + end.X, 
+                    Y = start.Y + end.Y, 
+                };
+            }
         }
     }
     enum Label {
@@ -46,26 +102,21 @@ public class Vision {
         Dictionary<
             Tuple<int, int>, Label
         > labels = new Dictionary<Tuple<int, int>, Label>();
-        List<Arc> residualArcs = new List<Arc>();
-        residualArcs.Add(new FullArc());
-        double eyeX = playerPos.Item1 + .5;
-        double eyeY = playerPos.Item2 + .5;
+        ArcSet residualArcs = new ArcSet();
+        // double eyeX = playerPos.Item1 + .5;
+        // double eyeY = playerPos.Item2 + .5;
         labels[playerPos] = Label.Seen;
-        while (residualArcs.Count != 0) {
-            Arc arc = residualArcs[0];
+        while (! residualArcs.IsEmpty()) {
             CastRay(
-                playerPos, eyeX, eyeY, 
-                arc.MidRad(eyeX, eyeY), world, labels
+                playerPos, 
+                residualArcs.Sample(), world, labels
             );
         }
     }
-    private static readonly double SW = - .75 * Math.PI;
-    private static readonly double SE = - .25 * Math.PI;
-    private static readonly double NE = + .25 * Math.PI;
-    private static readonly double NW = + .75 * Math.PI;
     private static void CastRay(
         Tuple<int, int> playerPos, 
-        double eyeX, double eyeY, double rad, 
+        // double eyeX, double eyeY, 
+        Orientation orientation, 
         Dictionary<Tuple<int, int>, int> world, 
         Dictionary<Tuple<int, int>, Label> labels
     ) {
