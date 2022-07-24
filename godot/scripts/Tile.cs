@@ -10,7 +10,7 @@ public class Tile {
     }
 
     static public bool DoesBlock(int x) {
-        if (x == WALL || x == DOOR_SHUT) {
+        if (x == WALL || x == DOOR_SHUT || x == UNKNOWN) {
             return true;
         } else return false;
     }

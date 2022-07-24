@@ -8,7 +8,9 @@ Quantum
         generate room
     extend from visible paths
         make up junctions and doors
-        if happens to connect to exit room, accept with probability
+        if happens to connect to exit room,
+            accept?
+            try to avoid?
 
 Story
     First, you have an item, reality scrambler. 

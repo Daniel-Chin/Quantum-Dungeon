@@ -143,17 +143,66 @@ public class Vision {
         // double eyeX = playerPos.Item1 + .5;
         // double eyeY = playerPos.Item2 + .5;
         while (! residualArcs.IsEmpty()) {
-            try {
-                var (collideX, collideY) = CastRay(
-                    playerPos, 
-                    residualArcs.Sample(), world, labels
-                );
-            } catch (CastOntoUnknown) {
-                throw;
-            }
+            Orientation orientation = residualArcs.Sample();
+            var (collideX, collideY) = CastRay(
+                playerPos, 
+                orientation, world, labels
+            );
+            var (relX, relY) = Offset(collideX, collideY, playerPos);
+            Assert(! (relX == 0 && relY == 0));
+            Arc newArc;
+            // switch (orientation.GetQuadrant()) {
+            //     case Quadrant.A:
+            //         newArc = new Arc() {
+            //             Start = new Orientation() {
+            //                 X = relX + 2, 
+            //                 Y = relY, 
+            //             },
+            //             End = new Orientation() {
+            //                 X = relX, 
+            //                 Y = relY + 2, 
+            //             },
+            //         };
+            //         break;
+            //     case Quadrant.B:
+            //         newArc = new Arc() {
+            //             Start = new Orientation() {
+            //                 X = relX + 2, 
+            //                 Y = relY + 2, 
+            //             },
+            //             End = new Orientation() {
+            //                 X = relX, 
+            //                 Y = relY, 
+            //             },
+            //         };
+            //         break;
+            //     case Quadrant.C:
+            //         newArc = new Arc() {
+            //             Start = new Orientation() {
+            //                 X = relX, 
+            //                 Y = relY + 2, 
+            //             },
+            //             End = new Orientation() {
+            //                 X = relX + 2, 
+            //                 Y = relY, 
+            //             },
+            //         };
+            //         break;
+            //     case Quadrant.D:
+            //         newArc = new Arc() {
+            //             Start = new Orientation() {
+            //                 X = relX, 
+            //                 Y = relY, 
+            //             },
+            //             End = new Orientation() {
+            //                 X = relX + 2, 
+            //                 Y = relY + 2, 
+            //             },
+            //         };
+            //         break;
+            // }
         }
     }
-    private class CastOntoUnknown : Exception {}
     private static Tuple<int, int> CastRay(
         Tuple<int, int> playerPos, 
         // double eyeX, double eyeY, 
@@ -169,11 +218,7 @@ public class Vision {
                     cellX, cellY
                 );
                 labels[cellXY] = Label.Seen;
-                int tile = world[cellXY];
-                if (tile == Tile.UNKNOWN) {
-                    throw new CastOntoUnknown();
-                }
-                if (Tile.DoesBlock(tile)) {
+                if (Tile.DoesBlock(world[cellXY])) {
                     break;
                 }
             }
@@ -212,8 +257,7 @@ public class Vision {
                 }
                 atEye = false;
             } else {
-                int relX = 2 * (cellX - playerPos.Item1) - 1;
-                int relY = 2 * (cellY - playerPos.Item2) - 1;
+                var (relX, relY) = Offset(cellX, cellY, playerPos);
                 C c00 = orientation.Compare(new Orientation() {
                     X = relX, 
                     Y = relY, 
@@ -311,6 +355,15 @@ public class Vision {
             }
         }
         return Tuple.Create(cellX, cellY);
+    }
+    private static Tuple<int, int> Offset(
+        int x, int y, 
+        Tuple<int, int> playerPos
+    ) {
+        return new Tuple<int, int>(
+            2 * (x - playerPos.Item1) - 1, 
+            2 * (y - playerPos.Item2) - 1
+        );
     }
     private static void Assert(bool x) {
         if (! x) {
