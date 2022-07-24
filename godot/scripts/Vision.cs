@@ -4,7 +4,10 @@ using System.Collections.Generic;
 
 public class Vision {
     enum Quadrant {
-        A, B, C, D, XPos, XNeg, YPos, YNeg, Origin
+        A, B, C, D, XPos, XNeg, YPos, YNeg, Origin, 
+    }
+    enum Draquant {
+        E, N, W, S, 
     }
     private class Orientation {
         // Cannot be (0, 0)
@@ -34,6 +37,21 @@ public class Vision {
                     return Quadrant.D;
                 } else {
                     return Quadrant.A;
+                }
+            }
+        }
+        public Draquant GetDraquant() {
+            if (X + Y < 0) {
+                if (X - Y < 0) {
+                    return Draquant.W;
+                } else {
+                    return Draquant.S;
+                }
+            } else {
+                if (X - Y < 0) {
+                    return Draquant.N;
+                } else {
+                    return Draquant.E;
                 }
             }
         }
@@ -128,25 +146,27 @@ public class Vision {
         while (! Tile.DoesBlock(world[cellXY])) {
             var (cellX, cellY) = cellXY;
             if (atEye) {
-                if (SW < rad && rad <= SE) {
-                    cellXY = Tuple.Create(cellX, cellY - 1);
-                } else if (SE < rad && rad <= NE) {
-                    cellXY = Tuple.Create(cellX + 1, cellY);
-                } else if (NE < rad && rad <= NW) {
-                    cellXY = Tuple.Create(cellX, cellY + 1);
-                } else {
-                    cellXY = Tuple.Create(cellX - 1, cellY);
+                switch (orientation.GetDraquant()) {
+                    case Draquant.E:
+                        cellXY = Tuple.Create(cellX + 1, cellY);
+                        break;
+                    case Draquant.N:
+                        cellXY = Tuple.Create(cellX, cellY + 1);
+                        break;
+                    case Draquant.W:
+                        cellXY = Tuple.Create(cellX - 1, cellY);
+                        break;
+                    case Draquant.S:
+                        cellXY = Tuple.Create(cellX, cellY - 1);
+                        break;
                 }
                 atEye = false;
             } else {
-                double relX = cellX - eyeX;
-                double relY = cellY - eyeY;
-                bool doFlip = relX < 0;
-                bool r00 = Math.Atan2(relX, relY) < rad;
-                bool r10 = Math.Atan2(relX + 1, relY) < rad;
+                double relX = 2 * (cellX - playerPos.Item1) - 1;
+                double relY = 2 * (cellY - playerPos.Item2) - 1;
+                
             }
             labels[cellXY] = Label.Seen;
-            new Fraction
         }
     }
 }
