@@ -36,7 +36,17 @@
 [node name="Main" type="Node2D"]
 script = ExtResource( 2 )
 
-[node name="MyTileMap" type="TileMap" parent="."]
+[node name="OldTileMap" type="TileMap" parent="."]
+tile_set = SubResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+
+[node name="SeenTileMap" type="TileMap" parent="."]
+tile_set = SubResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+
+[node name="FolkTileMap" type="TileMap" parent="."]
 tile_set = SubResource( 1 )
 cell_size = Vector2( 16, 16 )
 format = 1
