@@ -13,18 +13,18 @@ public class Main : Node2D {
     TileMap FolkTileMap;
 
     public override void _Ready() {
-        SeenTileMap = GetNode<TileMap> ("SeenTileMap");
-        OldTileMap  = GetNode<TileMap> ("OldTileMap");
-        FolkTileMap = GetNode<TileMap> ("FolkTileMap");
+        SeenTileMap = GetNode<TileMap>("SeenTileMap");
+        OldTileMap  = GetNode<TileMap>("OldTileMap");
+        FolkTileMap = GetNode<TileMap>("FolkTileMap");
         OldTileMap.Modulate = new Color(100, 100, 100);
 
         Reset();
     }
 
     public void Reset() {
-        TheSeen = new Dictionary<Tuple<int, int>, int> ();
-        TheOld = new Dictionary<Tuple<int, int>, int> ();
-        TheFolk = new Dictionary<Tuple<int, int>, int> ();
+        TheSeen = new Dictionary<Tuple<int, int>, int>();
+        TheOld = new Dictionary<Tuple<int, int>, int>();
+        TheFolk = new Dictionary<Tuple<int, int>, int>();
         PlayerPos = Tuple.Create(0, 0);
         int spawn_room_start = -2;
         int spawn_room_end = 3;
@@ -74,11 +74,5 @@ public class Main : Node2D {
             var (x, y) = cell.Key;
             tileMap.SetCell(x, y, cell.Value);
         }
-    }
-
-    private void See(
-        Dictionary<Tuple<int, int>, int> draftMatrix
-    ) {
-
     }
 }

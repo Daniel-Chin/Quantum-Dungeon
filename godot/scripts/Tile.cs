@@ -1,6 +1,3 @@
-using Godot;
-using System;
-
 public class Tile {
     public static readonly int UNKNOWN = 0;
     public static readonly int PLAYER = 1;
