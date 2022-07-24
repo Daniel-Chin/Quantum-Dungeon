@@ -51,7 +51,9 @@ public class Main : Node2D {
                 x, spawn_room_end - 1
             )] = Tile.WALL;
         }
-        TheSeen[Tuple.Create(0, spawn_room_start)] = Tile.DOOR;
+        TheSeen[Tuple.Create(
+            0, spawn_room_start
+        )] = Tile.DOOR_SHUT;
 
         Draw();
     }
