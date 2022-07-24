@@ -92,13 +92,21 @@ public class Vision {
         // Can be neither 0 nor 2 * PI. 
         public Orientation Start;
         public Orientation End;
+        public void Include(Orientation orientation) {
+            if (orientation.Compare(Start) == C.Less) {
+                Start = orientation;
+            }
+            if (orientation.Compare(End)   == C.Great) {
+                End   = orientation;
+            }
+        }
     }
     private class ArcSet {
         bool IsFull;
-        public List<Arc> Arcs;
+        private Queue<Arc> Arcs;
         public ArcSet() {
             IsFull = true;
-            Arcs = new List<Arc>();
+            Arcs = new Queue<Arc>();
         }
         public bool IsEmpty() {
             return ! IsFull && Arcs.Count == 0;
@@ -107,8 +115,9 @@ public class Vision {
             if (IsFull) {
                 return new Orientation() {X=1, Y=0};
             } else {
-                Orientation start = Arcs[0].Start;
-                Orientation end   = Arcs[0].End;
+                Arc arc = Arcs.Peek();
+                Orientation start = arc.Start;
+                Orientation end   = arc.End;
                 if (
                     start.X * end.Y <= 
                     start.Y * end.X
@@ -126,6 +135,20 @@ public class Vision {
                     X = start.X + end.X, 
                     Y = start.Y + end.Y, 
                 };
+            }
+        }
+        public void Subtract(Arc hole) {
+            if (IsFull) {
+                IsFull = false;
+                Arcs.Enqueue(new Arc() {
+                    Start = hole.End, 
+                    End   = hole.Start, 
+                });
+            } else {
+                // Safe to assume that only 
+                // the first arc is affected
+                Arc arc = Arcs.Dequeue();
+                // todo
             }
         }
     }
@@ -150,57 +173,25 @@ public class Vision {
             );
             var (relX, relY) = Offset(collideX, collideY, playerPos);
             Assert(! (relX == 0 && relY == 0));
-            Arc newArc;
-            // switch (orientation.GetQuadrant()) {
-            //     case Quadrant.A:
-            //         newArc = new Arc() {
-            //             Start = new Orientation() {
-            //                 X = relX + 2, 
-            //                 Y = relY, 
-            //             },
-            //             End = new Orientation() {
-            //                 X = relX, 
-            //                 Y = relY + 2, 
-            //             },
-            //         };
-            //         break;
-            //     case Quadrant.B:
-            //         newArc = new Arc() {
-            //             Start = new Orientation() {
-            //                 X = relX + 2, 
-            //                 Y = relY + 2, 
-            //             },
-            //             End = new Orientation() {
-            //                 X = relX, 
-            //                 Y = relY, 
-            //             },
-            //         };
-            //         break;
-            //     case Quadrant.C:
-            //         newArc = new Arc() {
-            //             Start = new Orientation() {
-            //                 X = relX, 
-            //                 Y = relY + 2, 
-            //             },
-            //             End = new Orientation() {
-            //                 X = relX + 2, 
-            //                 Y = relY, 
-            //             },
-            //         };
-            //         break;
-            //     case Quadrant.D:
-            //         newArc = new Arc() {
-            //             Start = new Orientation() {
-            //                 X = relX, 
-            //                 Y = relY, 
-            //             },
-            //             End = new Orientation() {
-            //                 X = relX + 2, 
-            //                 Y = relY + 2, 
-            //             },
-            //         };
-            //         break;
-            // }
+            Arc newArc = new Arc();
+            newArc.Start = new Orientation() {
+                X = relX, 
+                Y = relY, 
+            };
+            newArc.End = newArc.Start;
+            newArc.Include(new Orientation() {
+                X = relX + 2, 
+                Y = relY, 
+            });
+            newArc.Include(new Orientation() {
+                X = relX, 
+                Y = relY + 2, 
+            });
+            newArc.Include(new Orientation() {
+                X = relX + 2, 
+                Y = relY + 2, 
+            });
+            residualArcs.Subtract(newArc);
         }
     }
     private static Tuple<int, int> CastRay(
