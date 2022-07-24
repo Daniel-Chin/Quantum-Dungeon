@@ -3,11 +3,21 @@ using System;
 using System.Collections.Generic;
 
 public class Vision {
+    public enum C {
+        Less, Equal, Great, 
+    }
+    public static C Compare(int a, int b) {
+        if (a == b) {
+            return C.Equal;
+        } else if (a < b) {
+            return C.Less;
+        } else return C.Great;
+    }
     enum Quadrant {
         A, B, C, D, XPos, XNeg, YPos, YNeg, Origin, 
     }
     enum Draquant {
-        E, N, W, S, 
+        E, N, W, S, A, B, C, D, Origin, 
     }
     private class Orientation {
         // Cannot be (0, 0)
@@ -41,33 +51,42 @@ public class Vision {
             }
         }
         public Draquant GetDraquant() {
-            if (X + Y < 0) {
-                if (X - Y < 0) {
+            if (X + Y == 0) {
+                if (X - Y == 0) {
+                    return Draquant.Origin;
+                } else if (X - Y < 0) {
+                    return Draquant.B;
+                } else {
+                    return Draquant.D;
+                }
+            } else if (X + Y < 0) {
+                if (X - Y == 0) {
+                    return Draquant.C;
+                } else if (X - Y < 0) {
                     return Draquant.W;
                 } else {
                     return Draquant.S;
                 }
             } else {
-                if (X - Y < 0) {
+                if (X - Y == 0) {
+                    return Draquant.A;
+                } else if (X - Y < 0) {
                     return Draquant.N;
                 } else {
                     return Draquant.E;
                 }
             }
         }
-        // public enum C {
-        //     LESS, EQUAL, GREAT
-        // }
-        // public C Compare(Orientation that) {
-        //     int result = X * that.Y - Y * that.X;
-        //     if (result == 0) {
-        //         return C.EQUAL;
-        //     } else if (result < 0) {
-        //         return C.LESS;
-        //     } else {
-        //         return C.GREAT;
-        //     }
-        // }
+        public C Compare(Orientation that) {
+            int result = Y * that.X - X * that.Y;
+            if (result == 0) {
+                return C.Equal;
+            } else if (result < 0) {
+                return C.Less;
+            } else {
+                return C.Great;
+            }
+        }
     }
     private class Arc {
         // Can be neither 0 nor 2 * PI. 
@@ -123,50 +142,179 @@ public class Vision {
         ArcSet residualArcs = new ArcSet();
         // double eyeX = playerPos.Item1 + .5;
         // double eyeY = playerPos.Item2 + .5;
-        labels[playerPos] = Label.Seen;
         while (! residualArcs.IsEmpty()) {
-            CastRay(
-                playerPos, 
-                residualArcs.Sample(), world, labels
-            );
+            try {
+                var (collideX, collideY) = CastRay(
+                    playerPos, 
+                    residualArcs.Sample(), world, labels
+                );
+            } catch (CastOntoUnknown) {
+                throw;
+            }
         }
     }
-    private static void CastRay(
+    private class CastOntoUnknown : Exception {}
+    private static Tuple<int, int> CastRay(
         Tuple<int, int> playerPos, 
         // double eyeX, double eyeY, 
         Orientation orientation, 
         Dictionary<Tuple<int, int>, int> world, 
         Dictionary<Tuple<int, int>, Label> labels
     ) {
-        Tuple<int, int> cellXY = new Tuple<int, int>(
-            playerPos.Item1, 
-            playerPos.Item2
-        );
+        var (cellX, cellY) = playerPos;
         bool atEye = true;
-        while (! Tile.DoesBlock(world[cellXY])) {
-            var (cellX, cellY) = cellXY;
+        while (true) {
+            {
+                Tuple<int, int> cellXY = Tuple.Create(
+                    cellX, cellY
+                );
+                labels[cellXY] = Label.Seen;
+                int tile = world[cellXY];
+                if (tile == Tile.UNKNOWN) {
+                    throw new CastOntoUnknown();
+                }
+                if (Tile.DoesBlock(tile)) {
+                    break;
+                }
+            }
             if (atEye) {
                 switch (orientation.GetDraquant()) {
                     case Draquant.E:
-                        cellXY = Tuple.Create(cellX + 1, cellY);
+                        cellX ++;
                         break;
                     case Draquant.N:
-                        cellXY = Tuple.Create(cellX, cellY + 1);
+                        cellY ++;
                         break;
                     case Draquant.W:
-                        cellXY = Tuple.Create(cellX - 1, cellY);
+                        cellX --;
                         break;
                     case Draquant.S:
-                        cellXY = Tuple.Create(cellX, cellY - 1);
+                        cellY --;
                         break;
+                    case Draquant.A:
+                        cellX ++;
+                        cellY ++;
+                        break;
+                    case Draquant.B:
+                        cellX --;
+                        cellY ++;
+                        break;
+                    case Draquant.C:
+                        cellX --;
+                        cellY --;
+                        break;
+                    case Draquant.D:
+                        cellX ++;
+                        cellY --;
+                        break;
+                    default:
+                        throw new Exception("gbwr3i7h");
                 }
                 atEye = false;
             } else {
-                double relX = 2 * (cellX - playerPos.Item1) - 1;
-                double relY = 2 * (cellY - playerPos.Item2) - 1;
-                
+                int relX = 2 * (cellX - playerPos.Item1) - 1;
+                int relY = 2 * (cellY - playerPos.Item2) - 1;
+                C c00 = orientation.Compare(new Orientation() {
+                    X = relX, 
+                    Y = relY, 
+                });
+                C c02 = orientation.Compare(new Orientation() {
+                    X = relX, 
+                    Y = relY + 2, 
+                });
+                C c20 = orientation.Compare(new Orientation() {
+                    X = relX + 2, 
+                    Y = relY, 
+                });
+                C c22 = orientation.Compare(new Orientation() {
+                    X = relX + 2, 
+                    Y = relY + 2, 
+                });
+                switch (orientation.GetQuadrant()) {
+                    case Quadrant.A:
+                        Assert(c20 == C.Great);
+                        Assert(c02 == C.Less);
+                        switch (c22) {
+                            case C.Equal:
+                                cellX ++;
+                                cellY ++;
+                                break;
+                            case C.Less:
+                                cellX ++;
+                                break;
+                            case C.Great:
+                                cellY ++;
+                                break;
+                        }
+                        break;
+                    case Quadrant.B:
+                        Assert(c22 == C.Great);
+                        Assert(c00 == C.Less);
+                        switch (c02) {
+                            case C.Equal:
+                                cellX --;
+                                cellY ++;
+                                break;
+                            case C.Less:
+                                cellY ++;
+                                break;
+                            case C.Great:
+                                cellX --;
+                                break;
+                        }
+                        break;
+                    case Quadrant.C:
+                        Assert(c02 == C.Great);
+                        Assert(c20 == C.Less);
+                        switch (c00) {
+                            case C.Equal:
+                                cellX --;
+                                cellY --;
+                                break;
+                            case C.Less:
+                                cellX --;
+                                break;
+                            case C.Great:
+                                cellY --;
+                                break;
+                        }
+                        break;
+                    case Quadrant.D:
+                        Assert(c00 == C.Great);
+                        Assert(c22 == C.Less);
+                        switch (c20) {
+                            case C.Equal:
+                                cellX ++;
+                                cellY --;
+                                break;
+                            case C.Less:
+                                cellY --;
+                                break;
+                            case C.Great:
+                                cellX ++;
+                                break;
+                        }
+                        break;
+                    case Quadrant.XPos:
+                        cellX ++;
+                        break;
+                    case Quadrant.YPos:
+                        cellY ++;
+                        break;
+                    case Quadrant.XNeg:
+                        cellX --;
+                        break;
+                    case Quadrant.YNeg:
+                        cellY --;
+                        break;
+                }
             }
-            labels[cellXY] = Label.Seen;
+        }
+        return Tuple.Create(cellX, cellY);
+    }
+    private static void Assert(bool x) {
+        if (! x) {
+            throw new Exception("Assertion failed");
         }
     }
 }
