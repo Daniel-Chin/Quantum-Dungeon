@@ -1,8 +1,34 @@
-WFC
-    ? nonlocal
+- 使用 wave function collapse 生成地牢。  
+- 但是每回合都会根据现有视野重新生成！包括道具，敌人。  
+- 门开两次之后变成墙。  
+- 开局就有目的地, food, 和宝物的视野，你需要多次尝试让走廊连过去。  
+
+Quantum
+    if standing at door and room is invisible,
+        generate room
+    extend from visible paths
+        make up junctions and doors
+        if happens to connect to exit room, accept with probability
 
 Story
     First, you have an item, reality scrambler. 
         Using it will consume heat, but scrambles dungeon. 
         Then you toss it into lava. 
         That's how the main game begins. 
+
+archive {
+WFC
+    ? nonlocal
+
+quantum method
+    generate rooms whose doors are visible
+        stochastically grow one room at a time
+    extend from visible paths
+        make up junctions and rooms
+        if happens to connect to exit room, accept with probability
+    handle the exit room
+        paint a path towards paths / rooms
+        if fails, the exit room is unconnected!!!
+    CONCLUSION:
+        no need to have a consistent dungeon every frame! The player can observe so little, they can hardly prove contradiction! 
+}
