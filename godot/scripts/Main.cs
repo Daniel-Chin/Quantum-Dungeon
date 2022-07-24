@@ -17,6 +17,8 @@ public class Main : Node2D {
         OldTileMap  = GetNode<TileMap> ("OldTileMap");
         FolkTileMap = GetNode<TileMap> ("FolkTileMap");
         OldTileMap.Modulate = new Color(100, 100, 100);
+
+        Reset();
     }
 
     public void Reset() {
@@ -24,6 +26,31 @@ public class Main : Node2D {
         TheOld = new Dictionary<Tuple<int, int>, int> ();
         TheFolk = new Dictionary<Tuple<int, int>, int> ();
         PlayerPos = Tuple.Create(0, 0);
+        int spawn_room_start = -2;
+        int spawn_room_end = 3;
+        for (int x = spawn_room_start; x < spawn_room_end; x ++) {
+            TheSeen[Tuple.Create(
+                x, 0         
+            )] = Tile.WALL;
+            TheSeen[Tuple.Create(
+                x, spawn_room_end - 1
+            )] = Tile.WALL;
+            for (
+                int y = spawn_room_start; 
+                y < spawn_room_end; y ++
+            ) {
+                int toPlace;
+                if (x == 0 || x == spawn_room_end - 1) {
+                    toPlace = Tile.WALL;
+                } else {
+                    toPlace = Tile.PATH;
+                }
+                TheSeen[Tuple.Create(x, y)] = toPlace;
+            }
+        }
+        TheSeen[Tuple.Create(0, spawn_room_start)] = Tile.DOOR;
+
+        Draw();
     }
 
     public void Draw() {
@@ -44,5 +71,11 @@ public class Main : Node2D {
             var (x, y) = cell.Key;
             tileMap.SetCell(x, y, cell.Value);
         }
+    }
+
+    private void See(
+        Dictionary<Tuple<int, int>, int> draftMatrix
+    ) {
+
     }
 }
