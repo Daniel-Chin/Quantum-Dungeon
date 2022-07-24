@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 
 public class Vision {
+    static readonly double TWO_PI = 2 * Math.PI;
     public enum C {
         Less, Equal, Great, 
     }
@@ -87,18 +88,32 @@ public class Vision {
                 return C.Great;
             }
         }
+        public void Simplify() {
+            int gcd = Global.GCD(X, Y);
+            X /= gcd;
+            Y /= gcd;
+        }
     }
     private class Arc {
         // Can be neither 0 nor 2 * PI. 
         public Orientation Start;
         public Orientation End;
-        public void Include(Orientation orientation) {
+        public void ExpandTo(Orientation orientation) {
             if (orientation.Compare(Start) == C.Less) {
                 Start = orientation;
             }
             if (orientation.Compare(End)   == C.Great) {
                 End   = orientation;
             }
+        }
+        public bool DoesContain(Orientation orientation) {
+            double start = Math.Atan2(Start.Y, Start.X);
+            double end   = Math.Atan2(End  .Y, End  .X);
+            double test  = Math.Atan2(orientation.Y, orientation.X);
+            double start_test = (test - start) % TWO_PI;
+            double  test_end  = (end  - test ) % TWO_PI;
+            double start_end  = (end  - start) % TWO_PI;
+            return start_test + test_end - start_end < Math.PI;
         }
     }
     private class ArcSet {
@@ -138,6 +153,8 @@ public class Vision {
             }
         }
         public void Subtract(Arc hole) {
+            hole.Start.Simplify();
+            hole.End  .Simplify();
             if (IsFull) {
                 IsFull = false;
                 Arcs.Enqueue(new Arc() {
@@ -148,7 +165,47 @@ public class Vision {
                 // Safe to assume that only 
                 // the first arc is affected
                 Arc arc = Arcs.Dequeue();
-                // todo
+                bool aChS = arc .DoesContain(hole.Start);
+                bool aChE = arc .DoesContain(hole.End);
+                bool hCaS = hole.DoesContain(arc .Start);
+                bool hCaE = hole.DoesContain(arc .End);
+                if (aChS) {
+                    if (aChE) {
+                        if (hCaE) {
+                            Arcs.Enqueue(new Arc() {
+                                Start = hole.End, 
+                                End = hole.Start, 
+                            });
+                        } else {
+                            Arcs.Enqueue(new Arc() {
+                                Start = arc.Start, 
+                                End = hole.Start, 
+                            });
+                            Arcs.Enqueue(new Arc() {
+                                Start = hole.End, 
+                                End = arc.End, 
+                            });
+                        }
+                    } else {
+                        Arcs.Enqueue(new Arc() {
+                            Start = arc.Start, 
+                            End = hole.Start, 
+                        });
+                    }
+                } else {
+                    if (aChE) {
+                        Arcs.Enqueue(new Arc() {
+                            Start = hole.End, 
+                            End = arc.End, 
+                        });
+                    } else {
+                        if (hCaS) {
+                            // hole covers arc
+                        } else {
+                            Arcs.Enqueue(arc);
+                        }
+                    }
+                }
             }
         }
     }
@@ -179,15 +236,15 @@ public class Vision {
                 Y = relY, 
             };
             newArc.End = newArc.Start;
-            newArc.Include(new Orientation() {
+            newArc.ExpandTo(new Orientation() {
                 X = relX + 2, 
                 Y = relY, 
             });
-            newArc.Include(new Orientation() {
+            newArc.ExpandTo(new Orientation() {
                 X = relX, 
                 Y = relY + 2, 
             });
-            newArc.Include(new Orientation() {
+            newArc.ExpandTo(new Orientation() {
                 X = relX + 2, 
                 Y = relY + 2, 
             });
