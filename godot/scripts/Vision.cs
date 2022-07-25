@@ -211,7 +211,7 @@ public class Vision {
     }
     public static Dictionary<Tuple<int, int>, bool> See(
         Tuple<int, int> playerPos, 
-        Dictionary<Tuple<int, int>, int> world
+        Map<Tile> world
     ) {
         Dictionary<
             Tuple<int, int>, bool
@@ -253,7 +253,7 @@ public class Vision {
         Tuple<int, int> playerPos, 
         // double eyeX, double eyeY, 
         Orientation orientation, 
-        Dictionary<Tuple<int, int>, int> world, 
+        Map<Tile> world, 
         Dictionary<Tuple<int, int>, bool> labels
     ) {
         var (cellX, cellY) = playerPos;
@@ -264,7 +264,7 @@ public class Vision {
                     cellX, cellY
                 );
                 labels[cellXY] = true;
-                if (Tile.DoesBlock(world[cellXY])) {
+                if (world[cellXY].DoesBlock()) {
                     break;
                 }
             }
