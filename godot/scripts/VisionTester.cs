@@ -25,6 +25,7 @@ public class VisionTester : GamePlay {
     }
     public void See(
     ) {
+        GD.Print("VT See");
         GameState.TheSeen.Clear();
         Dictionary<
             Tuple<int, int>, bool
@@ -43,7 +44,7 @@ public class VisionTester : GamePlay {
             GD.Print("Hitting a doesBlock.");
         } else {
             GameState.PlayerPos = new Tuple<int, int>(pX, pY);
-            // See();
+            See();
             MyMain.Draw();
         }
     }
