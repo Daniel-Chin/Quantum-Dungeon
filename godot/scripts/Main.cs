@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 
 public class Main : Node2D {
-    Dictionary<Tuple<int, int>, int> TheSeen;
-    Dictionary<Tuple<int, int>, int> TheOld;
-    Dictionary<Tuple<int, int>, int> TheFolk;
+    Map<Tile> TheSeen;
+    Map<Tile> TheOld;
+    Map<Folk> TheFolk;
     Tuple<int, int> PlayerPos;
 
     TileMap SeenTileMap;
@@ -22,9 +22,9 @@ public class Main : Node2D {
     }
 
     public void Reset() {
-        TheSeen = new Dictionary<Tuple<int, int>, int>();
-        TheOld = new Dictionary<Tuple<int, int>, int>();
-        TheFolk = new Dictionary<Tuple<int, int>, int>();
+        TheSeen = new Map<Tile>();
+        TheOld = new Map<Tile>();
+        TheFolk = new Map<Folk>();
         PlayerPos = Tuple.Create(0, 0);
         int spawn_room_start = -2;
         int spawn_room_end = 3;
@@ -33,7 +33,7 @@ public class Main : Node2D {
                 int y = spawn_room_start; 
                 y < spawn_room_end; y ++
             ) {
-                int toPlace;
+                Tile toPlace;
                 if (
                     x == spawn_room_start || 
                     x == spawn_room_end - 1
@@ -59,15 +59,15 @@ public class Main : Node2D {
     }
 
     public void Draw() {
-        DrawTileMap(SeenTileMap, TheSeen);
-        DrawTileMap(OldTileMap, TheOld);
-        DrawTileMap(FolkTileMap, TheFolk);
+        DrawTileMap(SeenTileMap, TheSeen.ToEnumClassList());
+        DrawTileMap( OldTileMap, TheOld .ToEnumClassList());
+        DrawTileMap(FolkTileMap, TheFolk.ToEnumClassList());
         var (x, y) = PlayerPos;
-        FolkTileMap.SetCell(x, y, Tile.PLAYER);
+        FolkTileMap.SetCell(x, y, (int) Folk.PLAYER.Id);
     }
     private void DrawTileMap(
         TileMap tileMap, 
-        Dictionary<Tuple<int, int>, int> matrix
+        EnumClassList matrix
     ) {
         tileMap.Clear();
         foreach (KeyValuePair<
@@ -79,9 +79,9 @@ public class Main : Node2D {
     }
 
     private class VisionTester {
-        Dictionary<Tuple<int, int>, int> TheReal;
+        Map TheReal;
         public VisionTester() {
-            TheReal = new Dictionary<Tuple<int, int>, int>();
+            TheReal = new Map();
             for (int i = -10; i < 10; i ++) {
                 for (int j = -10; j < 10; j ++) {
                     int tile;
@@ -95,7 +95,7 @@ public class Main : Node2D {
             }
         }
         public void See(
-            Dictionary<Tuple<int, int>, int> theSeen, 
+            Map theSeen, 
             Tuple<int, int> playerPos
         ) {
             theSeen.Clear();

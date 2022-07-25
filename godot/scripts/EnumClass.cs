@@ -1,8 +1,18 @@
-public class EnumClass {
-    private int Id;
+using System;
+using System.Collections.Generic;
 
-    protected EnumClass(int id) {
-        Id = id;
+public class EnumClass {
+    public static readonly EnumClass UNKNOWN = new EnumClass(0);
+    public uint Id { get; private set; }
+    private static HashSet<uint> AllId;
+
+    protected EnumClass(uint id) {
+        if (AllId.Contains(id)) {
+            throw new Exception("q85horeu");
+        } else {
+            AllId.Add(id);
+            Id = id;
+        }
     }
     
     public override bool Equals(object obj) {
@@ -13,6 +23,6 @@ public class EnumClass {
     }
     public override int GetHashCode()
     {
-        return Id;
+        return (int) Id;
     }
 }

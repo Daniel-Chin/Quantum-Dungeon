@@ -1,6 +1,6 @@
 public class Folk : EnumClass {
-    public static readonly Folk PLAYER    = new Folk(0);
+    public static readonly Folk PLAYER    = new Folk(1);
 
-    protected Folk(int id): base(id) {
+    protected Folk(uint id): base(id) {
     }
 }
