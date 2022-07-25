@@ -15,6 +15,9 @@ public class Geometry {
         public double Slope {
             get; protected set;
         }
+        public double Intercept {
+            get; protected set;
+        }
         public double Length {
             get; protected set;
         }
@@ -30,11 +33,13 @@ public class Geometry {
             Vector = new Tuple<double, double>(dx, dy);
             Slope = dy / dx;
             Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+            Intercept = start.Item2 - start.Item1 * Slope;
         }
 
         public void Rasterize(
             Dictionary<Tuple<int, int>, bool> output
         ) {
+            double inverseSlope = 1 / Slope;
             int xSign = Math.Sign(Vector.Item1);
             int ySign = Math.Sign(Vector.Item2);
             if (xSign == 0 && ySign == 0)
@@ -57,29 +62,46 @@ public class Geometry {
                     if (x * Vector.Item1 + y * Vector.Item2 >= 0)
                         break;
                 }
-                double restX;
-                double lenX;
-                if (xSign == 0) {
-                    lenX = -1;
+                double armX = UnitVector.Item1 * 2;
+                double armY = UnitVector.Item2 * 2;
+                double handX = residualX + armX;
+                double handY = residualY + armY;
+                int sign_00 = Math.Sign(
+                    armY * 0 - handX - armX * 0 - handY
+                );
+                int sign_01 = Math.Sign(
+                    armY * 0 - handX - armX * 1 - handY
+                );
+                int sign_10 = Math.Sign(
+                    armY * 1 - handX - armX * 0 - handY
+                );
+                int sign_11 = Math.Sign(
+                    armY * 1 - handX - armX * 1 - handY
+                );
+                int moveX = 0;
+                int moveY = 0;
+                if      (sign_00 < sign_01) 
+                    moveX = -1;
+                else if (sign_01 < sign_11) 
+                    moveY = +1;
+                else if (sign_11 < sign_10) 
+                    moveX = +1;
+                else if (sign_10 < sign_00) 
+                    moveY = -1;
+                else 
+                    throw new Exception("ghe9p8hret534");
+                cellX += moveX;
+                cellY += moveY;
+                if (cellX != 0) {
+                    residualX = 0;
+                    residualY = (
+                        cellX * Slope + Intercept - cellY
+                    );
                 } else {
-                    if (xSign < 0) {
-                        restX =   - residualX;
-                    } else {
-                        restX = 1 - residualX;
-                    }
-                    lenX = restX / UnitVector.Item1;
-                }
-                double restY;
-                double lenY;
-                if (ySign == 0) {
-                    lenY = -1;
-                } else {
-                    if (ySign < 0) {
-                        restY =   - residualY;
-                    } else {
-                        restY = 1 - residualY;
-                    }
-                    lenY = restY / UnitVector.Item2;
+                    residualY = 0;
+                    residualX = (
+                        cellY - Intercept
+                    ) * inverseSlope - cellX;
                 }
             }
         }
