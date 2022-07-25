@@ -4,17 +4,15 @@ public class Main : Node2D {
     GamePlay Game;
     Display MyDisplay;
     public override void _Ready() {
-        Game = new VisionTester(this);
         MyDisplay = new Display(this);
+        Game = new VisionTester(this);
 
         Reset();
     }
 
     public void Reset() {
-        Game = new VisionTester(this);
-        GameState.Reset();
-
-        MyDisplay.Draw();
+        Game.Reset();
+        Draw();
     }
     public void Draw() {
         MyDisplay.Draw();

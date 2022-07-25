@@ -40,4 +40,11 @@ public class Map<T> : Dictionary<Tuple<int, int>, T> where T : EnumClass {
         }
         return map;
     }
+    public Map<T> Clone() {
+        Map<T> clone = new Map<T>();
+        foreach (KeyValuePair<Tuple<int, int>, T> cell in this) {
+            clone.Add(cell.Key, cell.Value);
+        }
+        return clone;
+    }
 }

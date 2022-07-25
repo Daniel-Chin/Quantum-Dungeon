@@ -5,18 +5,23 @@ using System.Collections.Generic;
 public class VisionTester : GamePlay {
     Map<Tile> TheReal;
     public VisionTester(Main main): base(main) {
+        Reset();
+    }
+    public override void Reset() {
+        GameState.Reset();
         TheReal = new Map<Tile>();
         for (int i = -10; i < 10; i ++) {
             for (int j = -10; j < 10; j ++) {
                 Tile tile;
-                if (Global.random.Next() % 2 == 0) {
-                    tile = Tile.PATH;
-                } else {
+                if (Global.random.Next() % 100 < 30) {
                     tile = Tile.WALL;
+                } else {
+                    tile = Tile.PATH;
                 }
                 TheReal[Tuple.Create(i, j)] = tile; 
             }
         }
+        GameState.TheSeen = TheReal.Clone();
     }
     public void See(
     ) {
@@ -38,7 +43,7 @@ public class VisionTester : GamePlay {
             GD.Print("Hitting a doesBlock.");
         } else {
             GameState.PlayerPos = new Tuple<int, int>(pX, pY);
-            See();
+            // See();
             MyMain.Draw();
         }
     }
