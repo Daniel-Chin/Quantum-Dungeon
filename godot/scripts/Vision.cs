@@ -209,16 +209,13 @@ public class Vision {
             }
         }
     }
-    enum Label {
-        Seen, Blocked, 
-    }
-    public static void See(
+    public static Dictionary<Tuple<int, int>, bool> See(
         Tuple<int, int> playerPos, 
         Dictionary<Tuple<int, int>, int> world
     ) {
         Dictionary<
-            Tuple<int, int>, Label
-        > labels = new Dictionary<Tuple<int, int>, Label>();
+            Tuple<int, int>, bool
+        > isSeen = new Dictionary<Tuple<int, int>, bool>();
         ArcSet residualArcs = new ArcSet();
         // double eyeX = playerPos.Item1 + .5;
         // double eyeY = playerPos.Item2 + .5;
@@ -226,7 +223,7 @@ public class Vision {
             Orientation orientation = residualArcs.Sample();
             var (collideX, collideY) = CastRay(
                 playerPos, 
-                orientation, world, labels
+                orientation, world, isSeen
             );
             var (relX, relY) = Offset(collideX, collideY, playerPos);
             Assert(! (relX == 0 && relY == 0));
@@ -250,13 +247,14 @@ public class Vision {
             });
             residualArcs.Subtract(newArc);
         }
+        return isSeen;
     }
     private static Tuple<int, int> CastRay(
         Tuple<int, int> playerPos, 
         // double eyeX, double eyeY, 
         Orientation orientation, 
         Dictionary<Tuple<int, int>, int> world, 
-        Dictionary<Tuple<int, int>, Label> labels
+        Dictionary<Tuple<int, int>, bool> labels
     ) {
         var (cellX, cellY) = playerPos;
         bool atEye = true;
@@ -265,7 +263,7 @@ public class Vision {
                 Tuple<int, int> cellXY = Tuple.Create(
                     cellX, cellY
                 );
-                labels[cellXY] = Label.Seen;
+                labels[cellXY] = true;
                 if (Tile.DoesBlock(world[cellXY])) {
                     break;
                 }
@@ -413,7 +411,7 @@ public class Vision {
             2 * (y - playerPos.Item2) - 1
         );
     }
-    private static void Assert(bool x) {
+    public static void Assert(bool x) {
         if (! x) {
             throw new Exception("Assertion failed");
         }
