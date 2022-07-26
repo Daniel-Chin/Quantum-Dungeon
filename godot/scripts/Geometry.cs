@@ -2,14 +2,25 @@ using System;
 using System.Collections.Generic;
 
 public class Geometry {
-    public class LineSegment {
-        public Tuple<double, double> Start {
+    public class Point<T> {
+        public T X;
+        public T Y;
+        public Point(T x, T y) {
+            X = x;
+            Y = y;
+        }
+    }
+    public class LineSegment<T> : IComparable {
+        public Point<T> Start {
             get; protected set;
         }
-        public Tuple<double, double> End {
+        public Point<T> End {
             get; protected set;
         }
-        public Tuple<double, double> Vector {
+        public int TwoManhattanMag {
+            get; protected set;
+        }
+        public Point<double> Vector {
             get; protected set;
         }
         public double Slope {
@@ -23,85 +34,123 @@ public class Geometry {
         }
 
         public LineSegment(
-            Tuple<double, double> start, 
-            Tuple<double, double> end
+           Point<T> start,  
+           Point<T> end 
         ) {
+            Type t = typeof(T);
+            if (t != typeof(int) && t != typeof(double))
+                throw new Exception("wrhg53");
             Start = start;
             End   = end;
-            double dx = end.Item1 - start.Item1;
-            double dy = end.Item2 - start.Item2;
-            Vector = new Tuple<double, double>(dx, dy);
-            Slope = dy / dx;
-            Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
-            Intercept = start.Item2 - start.Item1 * Slope;
+            if (
+                start.X is double sX && 
+                start.Y is double sY && 
+                end  .X is double eX && 
+                end  .Y is double eY
+            ) {
+                double dx = eX - sX;
+                double dy = eY - sY;
+                Vector = new Point<Double>(dx, dy);
+                Slope = dy / dx;
+                Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
+                Intercept = sY - sX * Slope;
+            }
+        }
+        public void UpdateManhattanMag(Point<int> playerPos) {
+            if (
+                Start.X is int sX &&
+                Start.Y is int sY &&
+                End  .X is int eX &&
+                End  .Y is int eY
+            ) {
+                TwoManhattanMag = (
+                    sX + eX + sY + eY 
+                    - 2 * playerPos.X 
+                    - 2 * playerPos.Y - 1
+                );
+            }
+        }
+        public int CompareTo(object obj) {
+            if (obj is LineSegment<int> other) {
+                return TwoManhattanMag.CompareTo(other.TwoManhattanMag);
+            } else {
+                throw new ArgumentException();
+            }
         }
 
         public void Rasterize(
             Dictionary<Tuple<int, int>, bool> output
         ) {
-            double inverseSlope = 1 / Slope;
-            int xSign = Math.Sign(Vector.Item1);
-            int ySign = Math.Sign(Vector.Item2);
-            if (xSign == 0 && ySign == 0)
-                return;
-            Tuple<double, double> UnitVector = new Tuple<double, double>(
-                Vector.Item1 / Length, 
-                Vector.Item2 / Length
-            );
-            int cellX = (int) Math.Floor(Start.Item1);
-            int cellY = (int) Math.Floor(Start.Item2);
-            double residualX = Start.Item1 - cellX;
-            double residualY = Start.Item2 - cellY;
-            while (true) {
-                output[new Tuple<int, int>(cellX, cellY)] = true;
-                {
-                    double x = cellX + residualX;
-                    double y = cellY + residualY;
-                    x -= End.Item1;
-                    y -= End.Item2;
-                    if (x * Vector.Item1 + y * Vector.Item2 >= 0)
-                        break;
-                }
-                double armX = UnitVector.Item1 * 2;
-                double armY = UnitVector.Item2 * 2;
-                double handX = residualX + armX;
-                double handY = residualY + armY;
-                int sign_00 = Math.Sign(
-                    armY * 0 - handX - armX * 0 - handY
+            if (
+                Start.X is double sX &&
+                Start.Y is double sY &&
+                End  .X is double eX &&
+                End  .Y is double eY
+            ) {
+                double inverseSlope = 1 / Slope;
+                int xSign = Math.Sign(Vector.X);
+                int ySign = Math.Sign(Vector.Y);
+                if (xSign == 0 && ySign == 0)
+                    return;
+                Point<Double> UnitVector = new Point<Double>(
+                    Vector.X / Length, 
+                    Vector.Y / Length
                 );
-                int sign_01 = Math.Sign(
-                    armY * 0 - handX - armX * 1 - handY
-                );
-                int sign_10 = Math.Sign(
-                    armY * 1 - handX - armX * 0 - handY
-                );
-                int sign_11 = Math.Sign(
-                    armY * 1 - handX - armX * 1 - handY
-                );
-                int moveX = 0;
-                int moveY = 0;
-                if      (sign_00 < sign_01) 
-                    moveX = -1;
-                else if (sign_01 < sign_11) 
-                    moveY = +1;
-                else if (sign_11 < sign_10) 
-                    moveX = +1;
-                else if (sign_10 < sign_00) 
-                    moveY = -1;
-                else 
-                    throw new Exception("ghe9p8hret534");
-                cellX += moveX;
-                cellY += moveY;
-                if (cellX != 0) {
-                    residualX = 0;
-                    residualY = (
-                        cellX * Slope + Intercept - cellY
+                int cellX = (int) Math.Floor(sX);
+                int cellY = (int) Math.Floor(sY);
+                double residualX = sX - cellX;
+                double residualY = sY - cellY;
+                while (true) {
+                    output[new Tuple<int, int>(cellX, cellY)] = true;
+                    {
+                        double x = cellX + residualX;
+                        double y = cellY + residualY;
+                        x -= eX;
+                        y -= eY;
+                        if (x * Vector.X + y * Vector.Y >= 0)
+                            break;
+                    }
+                    double armX = UnitVector.X * 2;
+                    double armY = UnitVector.Y * 2;
+                    double handX = residualX + armX;
+                    double handY = residualY + armY;
+                    int sign_00 = Math.Sign(
+                        armY * 0 - handX - armX * 0 - handY
                     );
-                } else {
-                    residualY = 0;
-                    residualX = (
-                        cellY - Intercept
-                    ) * inverseSlope - cellX;
+                    int sign_01 = Math.Sign(
+                        armY * 0 - handX - armX * 1 - handY
+                    );
+                    int sign_10 = Math.Sign(
+                        armY * 1 - handX - armX * 0 - handY
+                    );
+                    int sign_11 = Math.Sign(
+                        armY * 1 - handX - armX * 1 - handY
+                    );
+                    int moveX = 0;
+                    int moveY = 0;
+                    if      (sign_00 < sign_01) 
+                        moveX = -1;
+                    else if (sign_01 < sign_11) 
+                        moveY = +1;
+                    else if (sign_11 < sign_10) 
+                        moveX = +1;
+                    else if (sign_10 < sign_00) 
+                        moveY = -1;
+                    else 
+                        throw new Exception("ghe9p8hret534");
+                    cellX += moveX;
+                    cellY += moveY;
+                    if (cellX != 0) {
+                        residualX = 0;
+                        residualY = (
+                            cellX * Slope + Intercept - cellY
+                        );
+                    } else {
+                        residualY = 0;
+                        residualX = (
+                            cellY - Intercept
+                        ) * inverseSlope - cellX;
+                    }
                 }
             }
         }
