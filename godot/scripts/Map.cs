@@ -4,8 +4,8 @@ using System.Collections.Generic;
 // public class EnumClassList : List<
 //     KeyValuePair<Tuple<int, int>, EnumClass>
 // > {}
-public class Map : Dictionary<Tuple<int, int>, EnumClass> {
-    public new EnumClass this[Tuple<int, int> location] {
+public class Map : Dictionary<Point, EnumClass> {
+    public new EnumClass this[Point location] {
         get {
             try {
                 return base[location];
@@ -19,10 +19,10 @@ public class Map : Dictionary<Tuple<int, int>, EnumClass> {
     }
     public EnumClass this[int x, int y] {
         get {
-            return this[new Tuple<int, int>(x, y)];
+            return this[new Point(x, y)];
         }
         set {
-            this[new Tuple<int, int>(x, y)] = value;
+            this[new Point(x, y)] = value;
         }
     }
     // public EnumClassList ToEnumClassList() {
@@ -34,7 +34,7 @@ public class Map : Dictionary<Tuple<int, int>, EnumClass> {
     // }
     public Map Clone() {
         Map clone = new Map();
-        foreach (KeyValuePair<Tuple<int, int>, EnumClass> cell in this) {
+        foreach (KeyValuePair<Point, EnumClass> cell in this) {
             clone.Add(cell.Key, cell.Value);
         }
         return clone;

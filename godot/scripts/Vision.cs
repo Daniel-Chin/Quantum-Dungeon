@@ -13,7 +13,7 @@ public class Vision {
             Memory = Min();
         }
     }
-    class Connections {
+    protected class Connections {
         bool XPos;
         bool YPos;
         bool XNeg;
@@ -39,14 +39,43 @@ public class Vision {
             }
         }
     }
+    protected static void MapToGraph(
+        Map map, HashSet<Point> points, 
+        Dictionary<Point, Connections> edges
+    ) {
+        foreach (KeyValuePair<Point, EnumClass> cell in map) {
+            if (cell.Value is Tile tile) {
+                if (tile.DoesBlock()) {
+                    Point p00 = cell.Key;
+                    for (int dx = -1; dx <= 1; dx += 2) {
+                        for (int dy = -1; dy <= 1; dy += 2) {
+                            Point corner = new Point(
+                                p00.X + dx, p00.Y + dy
+                            );
+                            points.Add(corner);
+                            if (! edges.ContainsKey(corner)) {
+                                edges.Add(corner, new Connections());
+                            }
+                            Connections connections = edges[corner];
+                            connections[dx, 0] = ! connections[dx, 0];
+                            connections[0, dy] = ! connections[0, dy];
+                        }
+                    }
+                }
+            } else {
+                throw new Exception("9g835h4");
+            }
+        }
+    }
     public static List<Point> GetVertices(
         Map map, Point playerPos
     ) {
-        // Sorting must be jijiao - far<near
         List<Point> vertices = new List<Point>();
         RBTree rBTree = new RBTree();
-        List<Point> gridPoints = new List<Point>();
+        HashSet<Point> gridPoints = new HashSet<Point>();
         Dictionary<Point, Connections> edges = new Dictionary<Point, Connections>();
+        MapToGraph(map, gridPoints, edges);
+        // Sorting must be jijiao - far<near
         foreach (Point point in gridPoints) {
             int deltaSeenEdges = 0;
             bool isVertexSeen = false;
@@ -99,5 +128,6 @@ public class Vision {
                 }
             }
         }
+        return vertices;
     }
 }
