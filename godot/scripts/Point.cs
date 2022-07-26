@@ -36,7 +36,7 @@ public class Point<T> : Point {
     }
     public override int GetHashCode() {
         if (X is int ix && Y is int iy) {
-            return ix * 128 + iy;
+            return ix << 7 ^ iy;
         } else if (X is double dx && Y is double dy) {
             return dx.GetHashCode() ^ dy.GetHashCode();
         } else throw new Exception("eri358");

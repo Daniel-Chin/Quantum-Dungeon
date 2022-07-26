@@ -80,7 +80,7 @@ public class LineSegment<T> : IComparable {
         }
     }
     public override int GetHashCode() {
-        return Start.GetHashCode() * 16384 + End.GetHashCode();
+        return Start.GetHashCode() << 14 ^ End.GetHashCode();
     }
 
     public void Rasterize(
