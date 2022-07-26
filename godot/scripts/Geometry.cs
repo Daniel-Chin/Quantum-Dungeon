@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 
 public class Geometry {
-    public class Point<T> {
+    public abstract class Point {}
+    public class Point<T> : Point {
         public T X;
         public T Y;
         public Point(T x, T y) {
@@ -17,7 +18,7 @@ public class Geometry {
         public Point<T> End {
             get; protected set;
         }
-        public int TwoManhattanMag {
+        public int FourManhattanMag {
             get; protected set;
         }
         public Point<double> Vector {
@@ -63,16 +64,17 @@ public class Geometry {
                 End  .X is int eX &&
                 End  .Y is int eY
             ) {
-                TwoManhattanMag = (
-                    sX + eX + sY + eY 
-                    - 2 * playerPos.X 
-                    - 2 * playerPos.Y - 1
+                FourManhattanMag = (
+                    + Math.Abs(2 * (sX - playerPos.X) - 1)
+                    + Math.Abs(2 * (eX - playerPos.X) - 1)
+                    + Math.Abs(2 * (sY - playerPos.Y) - 1)
+                    + Math.Abs(2 * (eY - playerPos.Y) - 1)
                 );
             }
         }
         public int CompareTo(object obj) {
             if (obj is LineSegment<int> other) {
-                return TwoManhattanMag.CompareTo(other.TwoManhattanMag);
+                return FourManhattanMag.CompareTo(other.FourManhattanMag);
             } else {
                 throw new ArgumentException();
             }
