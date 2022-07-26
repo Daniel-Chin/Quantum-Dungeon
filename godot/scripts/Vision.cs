@@ -67,6 +67,39 @@ public class Vision {
             }
         }
     }
+    protected class PointPolar : IComparable {
+        public Point ThePoint;
+        public double Phase;
+        public double Manhattan;
+        public int CompareTo(object obj) {
+            if (obj is PointPolar other) {
+                if (Math.Abs(Phase - other.Phase) < double.Epsilon) {
+                    return Manhattan.CompareTo(other.Manhattan);
+                } else {
+                    return Phase    .CompareTo(other.Phase);
+                }
+            } else {
+                throw new ArgumentException();
+            }
+        }
+    }
+    protected static IEnumerable<Point> SortByOrientation(
+        HashSet<Point> points, Point playerPos
+    ) {
+        Point eye = playerPos.Offset05();
+        List<PointPolar> list = new List<PointPolar>();
+        foreach (Point p in points) {
+            double dY = p.Y - eye.Y;
+            double dX = p.X - eye.X;
+            list.Add(new PointPolar() {
+                ThePoint = p, 
+                Phase = Math.Atan2(dY, dX), 
+                Manhattan = Math.Abs(dX) + Math.Abs(dY),
+            });
+        }
+        list.Sort();
+        return list.Select(x => x.ThePoint);
+    }
     public static List<Point> GetVertices(
         Map map, Point playerPos
     ) {
@@ -75,8 +108,11 @@ public class Vision {
         HashSet<Point> gridPoints = new HashSet<Point>();
         Dictionary<Point, Connections> edges = new Dictionary<Point, Connections>();
         MapToGraph(map, gridPoints, edges);
-        // Sorting must be jijiao - far<near
-        foreach (Point point in gridPoints) {
+        IEnumerable<Point> sortedGridPoints = SortByOrientation(
+            gridPoints, playerPos
+        );
+        // Missing init condition
+        foreach (Point point in sortedGridPoints) {
             int deltaSeenEdges = 0;
             bool isVertexSeen = false;
             rBTree.Memorize();
@@ -96,6 +132,7 @@ public class Vision {
                             }
                             rBTree.Remove(lineSeg);
                         } else {
+                            lineSeg.UpdateManhattanMag(playerPos);
                             rBTree.Add(lineSeg, true);
                             if (lineSeg == rBTree.Min()) {
                                 isVertexSeen = true;
