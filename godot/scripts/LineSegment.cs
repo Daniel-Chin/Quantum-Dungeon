@@ -159,4 +159,30 @@ public class LineSegment<T> : IComparable {
             }
         }
     }
+    public Point<double> IntersectWith(LineSegment<double> that) {
+        var (A0, B0, C0) = ABC();
+        var (A1, B1, C1) = that.ABC();
+        double delta = A0 * B1 - A1 * B0;
+        if (delta == 0) 
+            throw new Exception("Parallel lines");
+        return new Point<double>(
+            (B1 * C0 - B0 * C1) / delta, 
+            (A0 * C1 - A1 * C0) / delta
+        );
+    }
+    protected Tuple<double, double, double> ABC() {
+        if (
+            Start.X is int sX &&
+            Start.Y is int sY &&
+            End  .X is int eX &&
+            End  .Y is int eY
+        ) {
+            int A = eY - sY;
+            int B = eX - sX;
+            int C = A * sX + B * sY;
+            return new Tuple<int, int, int>(A, B, C);
+        } else {
+            throw new Exception("4gowiu34");
+        }
+    }
 }

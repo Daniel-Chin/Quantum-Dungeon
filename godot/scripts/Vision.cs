@@ -40,8 +40,9 @@ public class Vision {
         }
     }
     public static List<Point> GetVertices(
-        Map<Tile> map, Tuple<int, int> playerPos
+        Map<Tile> map, Point<int> playerPos
     ) {
+        // Sorting must be jijiao - far<near
         List<Point> vertices = new List<Point>();
         RBTree rBTree = new RBTree();
         List<Point<int>> gridPoints = new List<Point<int>>();
@@ -85,6 +86,9 @@ public class Vision {
                 } else {
                     backWall = rBTree.Min();
                 }
+                backWall.IntersectWith(new LineSegment<int>(
+                    
+                ));
             }
         }
     }
