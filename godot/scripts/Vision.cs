@@ -77,18 +77,26 @@ public class Vision {
                 }
             }
             if (isVertexSeen) {
-                vertices.Add(point);
-            }
-            if (deltaSeenEdges != 0) {
-                LineSegment backWall;
-                if (deltaSeenEdges == 2) {
-                    backWall = rBTree.Memory;
+                if (deltaSeenEdges == 0) {
+                    vertices.Add(point);
                 } else {
-                    backWall = rBTree.Min();
+                    LineSegment backWall;
+                    if (deltaSeenEdges == 2) {
+                        backWall = rBTree.Memory;
+                    } else {
+                        backWall = rBTree.Min();
+                    }
+                    Point intersect = backWall.IntersectWith(new LineSegment(
+                        playerPos.Offset05(), point
+                    ));
+                    if (deltaSeenEdges == 2) {
+                        vertices.Add(intersect);
+                        vertices.Add(point);
+                    } else {
+                        vertices.Add(point);
+                        vertices.Add(intersect);
+                    }
                 }
-                backWall.IntersectWith(new LineSegment<int>(
-                    
-                ));
             }
         }
     }
