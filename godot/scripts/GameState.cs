@@ -1,15 +1,15 @@
 using System;
 
 class GameState {
-    public static Map<Tile> TheSeen;
-    public static Map<Tile> TheOld;
-    public static Map<Folk> TheFolk;
+    public static Map TheSeen;
+    public static Map TheOld;
+    public static Map TheFolk;
     public static Tuple<int, int> PlayerPos;
     
     public static void Reset() {
-        TheSeen = new Map<Tile>();
-        TheOld = new Map<Tile>();
-        TheFolk = new Map<Folk>();
+        TheSeen = new Map();
+        TheOld  = new Map();
+        TheFolk = new Map();
         PlayerPos = Tuple.Create(0, 0);
 
         int spawn_room_start = -2;

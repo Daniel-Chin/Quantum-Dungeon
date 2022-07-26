@@ -13,15 +13,15 @@ class Display {
         OldTileMap.Modulate = new Color(100, 100, 100);
     }
     public void Draw() {
-        DrawTileMap(SeenTileMap, GameState.TheSeen.DownCast());
-        DrawTileMap( OldTileMap, GameState.TheOld .DownCast());
-        DrawTileMap(FolkTileMap, GameState.TheFolk.DownCast());
+        DrawTileMap(SeenTileMap, GameState.TheSeen);
+        DrawTileMap( OldTileMap, GameState.TheOld );
+        DrawTileMap(FolkTileMap, GameState.TheFolk);
         var (x, y) = GameState.PlayerPos;
         FolkTileMap.SetCell(x, y, (int) Folk.PLAYER.Id);
     }
     private void DrawTileMap(
         TileMap tileMap, 
-        Map<EnumClass> map
+        Map map
     ) {
         tileMap.Clear();
         foreach (

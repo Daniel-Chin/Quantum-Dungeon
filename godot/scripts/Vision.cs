@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class Vision {
-    class RBTree : SortedDictionary<LineSegment<int>, bool> {
-        public LineSegment<int> Memory {
+    class RBTree : SortedDictionary<LineSegment, bool> {
+        public LineSegment Memory {
             get; protected set;
         }
-        public LineSegment<int> Min() => Keys.First();
-        public LineSegment<int> Max() => Keys.Last();
+        public LineSegment Min() => Keys.First();
+        public LineSegment Max() => Keys.Last();
         public void Memorize() {
             Memory = Min();
         }
@@ -40,22 +40,22 @@ public class Vision {
         }
     }
     public static List<Point> GetVertices(
-        Map<Tile> map, Point<int> playerPos
+        Map map, Point playerPos
     ) {
         // Sorting must be jijiao - far<near
         List<Point> vertices = new List<Point>();
         RBTree rBTree = new RBTree();
-        List<Point<int>> gridPoints = new List<Point<int>>();
-        Dictionary<Point<int>, Connections> edges = new Dictionary<Point<int>, Connections>();
-        foreach (Point<int> point in gridPoints) {
+        List<Point> gridPoints = new List<Point>();
+        Dictionary<Point, Connections> edges = new Dictionary<Point, Connections>();
+        foreach (Point point in gridPoints) {
             int deltaSeenEdges = 0;
             bool isVertexSeen = false;
             rBTree.Memorize();
             for (int x = -1; x <= 1; x += 2) {
                 for (int y = -1; y <= 1; y += 2) {
                     if (edges[point][x, y]) {
-                        LineSegment<int> lineSeg = new LineSegment<int>(
-                            point, new Point<int>(
+                        LineSegment lineSeg = new LineSegment(
+                            point, new Point(
                                 point.X + x, 
                                 point.Y + y
                             )
@@ -80,7 +80,7 @@ public class Vision {
                 vertices.Add(point);
             }
             if (deltaSeenEdges != 0) {
-                LineSegment<int> backWall;
+                LineSegment backWall;
                 if (deltaSeenEdges == 2) {
                     backWall = rBTree.Memory;
                 } else {

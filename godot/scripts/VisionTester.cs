@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 
 public class VisionTester : GamePlay {
-    Map<Tile> TheReal;
+    Map TheReal;
     public VisionTester(Main main): base(main) {
         Reset();
     }
     public override void Reset() {
         GameState.Reset();
-        TheReal = new Map<Tile>();
+        TheReal = new Map();
         for (int i = -10; i < 10; i ++) {
             for (int j = -10; j < 10; j ++) {
                 Tile tile;

@@ -1,44 +1,54 @@
 using System;
-public abstract class Point {}
-public class Point<T> : Point {
-    public T X;
-    public T Y;
-    public Point(T x, T y) {
+public class Point {
+    public double X {
+        get; private set; 
+    }
+    public double Y {
+        get; private set; 
+    }
+    public bool IsInt {
+        get; private set; 
+    }
+    private int intX;
+    public int IntX {
+        get {
+            new Assert(IsInt);
+            return intX;
+        }
+    }
+    private int intY;
+    public int IntY {
+        get {
+            new Assert(IsInt);
+            return intY;
+        }
+    }
+    public Point(double x, double y) {
         X = x;
         Y = y;
+        IsInt = false;
+    }
+    public Point(int x, int y) {
+        X = (double) x;
+        Y = (double) y;
+        IsInt = true;
+        intX = x;
+        intY = y;
     }
     public override bool Equals(object obj) {
-        if (obj is Point<T> other) {
-            if (
-                other.X is int oiX &&
-                other.Y is int oiY &&
-                      X is int tiX &&
-                      Y is int tiY 
-            ) {
-                return (
-                    tiX == oiX &&
-                    tiY == oiY
-                );
-            } else if (
-                other.X is double odX &&
-                other.Y is double odY &&
-                      X is double tdX &&
-                      Y is double tdY 
-            ) {
-                return (
-                    tdX == odX &&
-                    tdY == odY
-                );
-            } else throw new Exception("gr35nu");
+        if (obj is Point other) {
+            return (
+                Math.Abs(X - other.X) < double.Epsilon &&
+                Math.Abs(Y - other.Y) < double.Epsilon
+            );
         } else {
             return false;
         }
     }
     public override int GetHashCode() {
-        if (X is int ix && Y is int iy) {
-            return ix << 7 ^ iy;
-        } else if (X is double dx && Y is double dy) {
-            return dx.GetHashCode() ^ dy.GetHashCode();
-        } else throw new Exception("eri358");
+        return X.GetHashCode() ^ Y.GetHashCode();
+    }
+    public Point Offset05() {
+        return new Point(X + .5, Y + .5);
     }
 }
