@@ -51,4 +51,7 @@ public class Point {
     public Point Offset05() {
         return new Point(X + .5, Y + .5);
     }
+    public double ManhattanMag() {
+        return Math.Abs(X) + Math.Abs(Y);
+    }
 }
