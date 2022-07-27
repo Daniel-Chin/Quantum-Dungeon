@@ -3,7 +3,11 @@ using System;
 using System.Collections.Generic;
 
 public class DebugCanvas : Node2D {
+    public static DebugCanvas Self = null;
     public List<Point> CachedVertices;
+    public override void _Ready() {
+        Self = this;
+    }
     public override void _Draw() {
         PlotVertices();
     }
@@ -18,7 +22,7 @@ public class DebugCanvas : Node2D {
             Vector2 next = Display.Coord2Pixel(p);
             DrawLine(
                 next, last, 
-                new Color(i, 1 - i, 1), 
+                new Color(i, 1, 0), 
                 width: 2
             );
             last = next;

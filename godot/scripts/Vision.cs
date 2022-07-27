@@ -95,18 +95,20 @@ public class Vision {
             if (cell.Value is Tile tile) {
                 if (tile.DoesBlock()) {
                     PointInt p00 = cell.Key;
-                    for (int dx = -1; dx <= 1; dx += 2) {
-                        for (int dy = -1; dy <= 1; dy += 2) {
+                    for (int dx = 0; dx < 2; dx ++) {
+                        for (int dy = 0; dy < 2; dy ++) {
                             PointInt corner = new PointInt(
                                 p00.IntX + dx, p00.IntY + dy
                             );
                             points.Add(corner);
+                            int dirX = dx * 2 - 1;
+                            int dirY = dy * 2 - 1;
                             if (! edges.ContainsKey(corner)) {
                                 edges.Add(corner, new Connections());
                             }
                             Connections connections = edges[corner];
-                            connections[dx, 0] = ! connections[dx, 0];
-                            connections[0, dy] = ! connections[0, dy];
+                            connections[dirX, 0] = ! connections[dirX, 0];
+                            connections[0, dirY] = ! connections[0, dirY];
                         }
                     }
                 }
@@ -153,9 +155,11 @@ public class Vision {
         HashSet<PointInt> gridPoints = new HashSet<PointInt>();
         Dictionary<PointInt, Connections> edges = new Dictionary<PointInt, Connections>();
         MapToGraph(map, gridPoints, edges);
+        // DebugCanvas.Self.CachedVertices = gridPoints.Select(x => (Point)x).ToList();
         IEnumerable<PointInt> sortedGridPoints = SortByOrientation(
             gridPoints, eyePos
         );
+        // DebugCanvas.Self.CachedVertices = sortedGridPoints.Select(x => (Point)x).ToList();
         rBTree.Initialize(sortedGridPoints, edges);
         foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
