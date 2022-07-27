@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://texture/tileset.png" type="Texture" id=1]
 [ext_resource path="res://scripts/Main.cs" type="Script" id=2]
 [ext_resource path="res://scripts/DebugCanvas.cs" type="Script" id=3]
+[ext_resource path="res://scripts/Rasterizor.cs" type="Script" id=4]
 
 [sub_resource type="TileSet" id=1]
 0/name = "tileset.png 0"
@@ -81,10 +82,27 @@ cell_size = Vector2( 32, 32 )
 format = 1
 
 [node name="Polygon" type="Polygon2D" parent="."]
-color = Color( 1, 1, 0, 0.439216 )
+color = Color( 0, 0, 0, 0.439216 )
+invert_enable = true
+invert_border = 1000.0
 
 [node name="DebugCanvas" type="Node2D" parent="."]
 script = ExtResource( 3 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
+current = true
+
+[node name="RasterPreview" type="ViewportContainer" parent="."]
+margin_right = 100.0
+margin_bottom = 100.0
+
+[node name="Rasterizor" type="Viewport" parent="RasterPreview"]
+size = Vector2( 64, 64 )
+usage = 1
+script = ExtResource( 4 )
+
+[node name="PolygonRaster" type="Polygon2D" parent="RasterPreview/Rasterizor"]
+
+[node name="CameraRaster" type="Camera2D" parent="RasterPreview/Rasterizor"]
+anchor_mode = 0
 current = true

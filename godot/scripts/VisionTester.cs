@@ -5,7 +5,9 @@ using System.Collections.Generic;
 public class VisionTester : GamePlay {
     Map TheReal;
     DebugCanvas DebugCanvas;
-    public VisionTester(Main main): base(main) {
+    public VisionTester(
+        Main main, Rasterizor raster
+    ): base(main, raster) {
         DebugCanvas = main.GetNode<DebugCanvas>("DebugCanvas");
         Reset();
     }
@@ -42,8 +44,12 @@ public class VisionTester : GamePlay {
         MyMain.MyDisplay.DrawPolygon(vertices);
         DebugCanvas.Update();
         GameState.TheSeen.Clear();
-        foreach (KeyValuePair<PointInt, EnumClass> entry in TheReal) {
-            GameState.TheSeen[entry.Key] = entry.Value;
+        Dictionary<PointInt, bool> IsSeen = new Dictionary<PointInt, bool>();
+        Raster.Eat(vertices, IsSeen);
+        foreach (KeyValuePair<PointInt, bool> entry in IsSeen) {
+            if (entry.Value) {
+                GameState.TheSeen[entry.Key] = TheReal[entry.Key];
+            }
         }
     }
 
