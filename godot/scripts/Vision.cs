@@ -146,7 +146,7 @@ public class Vision {
         Array.Sort(array);
         return array.Select(x => x.ThePoint);
     }
-    public static int DEBUG_I = 0;
+    // public static int DEBUG_I = 0;
     public static List<Point> GetVertices(
         Map map, PointInt playerPos
     ) {
@@ -164,15 +164,15 @@ public class Vision {
         );
         // DebugCanvas.Self.PolygonVerts = sortedGridPoints.Select(x => (Point)x).ToList();
         rBTree.Initialize(sortedGridPoints, edges);
-        DebugCanvas.Self.MyRBTree = rBTree;
-        DebugCanvas.Self.PolygonVerts = vertices;
-        if (DEBUG_I == 0)
-            return new List<Point>();
-        int debugI = 0;
+        // DebugCanvas.Self.MyRBTree = rBTree;
+        // DebugCanvas.Self.PolygonVerts = vertices;
+        // if (DEBUG_I == 0)
+        //     return new List<Point>();
+        // int debugI = 0;
         foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
             if (
-                point.ManhattanMag() - 1 
+                point.ManhattanMag(eyePos) - 1 
                 < rBTree.Min().ManhattanMag
             ) {
                 isVertexSeen = true;
@@ -216,7 +216,7 @@ public class Vision {
                 }
             }
             if (isVertexSeen) {
-                if (DEBUG_I == ++ debugI) return new List<Point>();
+                // if (DEBUG_I == ++ debugI) return new List<Point>();
                 if (deltaSeenEdges == 0) {
                     vertices.Add(point);
                 } else {
@@ -239,6 +239,28 @@ public class Vision {
                 }
             }
         }
-        return vertices;
+        List<Point> processed = new List<Point>();
+        double lastPhase = - Math.PI;
+        Point lastPoint = null;
+        foreach (Point p in vertices) {
+            double phase = Math.Atan2(
+                p.Y - eyePos.Y, 
+                p.X - eyePos.X
+            );
+            if (Math.Abs(phase - lastPhase) > double.Epsilon) {
+                if (lastPoint != null) {
+                    processed.Add(lastPoint);
+                    lastPoint = null;
+                }
+                processed.Add(p);
+            } else {
+                lastPoint = p;
+            }
+            lastPhase = phase;
+        }
+        if (lastPoint != null) {
+            processed.Add(lastPoint);
+        }
+        return processed;
     }
 }

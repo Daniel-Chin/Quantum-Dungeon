@@ -49,8 +49,8 @@ public class Point : IComparable<Point> {
     public Point Offset05() {
         return new Point(X + .5, Y + .5);
     }
-    public double ManhattanMag() {
-        return Math.Abs(X) + Math.Abs(Y);
+    public double ManhattanMag(Point eye) {
+        return Math.Abs(X - eye.X) + Math.Abs(Y - eye.Y);
     }
 }
 

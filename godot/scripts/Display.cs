@@ -45,7 +45,17 @@ public class Display {
         );
     }
     public void DrawPolygon(List<Point> vertices) {
-        GD.PrintS(string.Join( ", ", vertices));
+        // GD.PrintS("Polygon");
+        // double last = - Math.PI;
+        // foreach (Point p in vertices) {
+        //     double next = Math.Atan2(
+        //         p.Y - GameState.PlayerPos.Offset05().Y, 
+        //         p.X - GameState.PlayerPos.Offset05().X 
+        //     );
+        //     GD.PrintS(" ", p, next - last);
+        //     last = next;
+        // }
+        // GD.PrintS();
         Polygon.Polygon = vertices.Select(Coord2Pixel).ToArray();
     }
 }

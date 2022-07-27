@@ -67,8 +67,8 @@ public class VisionTester : GamePlay {
         MyMain.MyDisplay.DrawPolygon(vertices);
     }
     public void OnK() {
-        Vision.DEBUG_I ++;
-        See();
-        DebugCanvas.Self.Update();
+        // Vision.DEBUG_I ++;
+        // See();
+        // DebugCanvas.Self.Update();
     }
 }
