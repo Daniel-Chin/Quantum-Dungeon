@@ -1,1 +1,13 @@
 插眼
+
+Objects' environmental presence
+    敌人
+        留下痕迹 / 烟雾弹 / 向前射出激光、箭
+    宝物, 房间
+        ...
+    Biome 算一个 special case. 
+
+The outdoor area
+    一块无限草坪。
+    会刷出许多地牢走廊小 fragments, 大多数是直道或L型弯。
+    偶尔刷出U型弯。可以用来回到地牢。
