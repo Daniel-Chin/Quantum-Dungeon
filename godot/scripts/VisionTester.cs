@@ -22,6 +22,7 @@ public class VisionTester : GamePlay {
             }
         }
         GameState.TheSeen = TheReal.Clone();
+        MyMain.MyDisplay.DrawTileMaps();
     }
     public override void See() {
         GD.Print("VT See");

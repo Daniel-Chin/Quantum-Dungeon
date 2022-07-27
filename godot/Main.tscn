@@ -74,7 +74,7 @@ tile_set = SubResource( 1 )
 cell_size = Vector2( 32, 32 )
 format = 1
 
-[node name="FolkMap" type="TileMap" parent="."]
+[node name="FolkTileMap" type="TileMap" parent="."]
 tile_set = SubResource( 1 )
 cell_size = Vector2( 32, 32 )
 format = 1

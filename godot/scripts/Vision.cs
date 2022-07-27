@@ -1,5 +1,7 @@
+using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Linq;
 
 public class Vision {
@@ -13,11 +15,27 @@ public class Vision {
         public RBTree(Point eyePos) {
             EyePos = eyePos;
         }
+        public override string ToString() {
+            StringBuilder sB = new StringBuilder();
+            sB.Append("RBTree [ \n");
+            foreach (LineSegmentInt lineSeg in Keys) {
+                sB.Append("  ");
+                sB.Append(lineSeg);
+                sB.Append('\n');
+            }
+            sB.Append("]");
+            return sB.ToString();
+        }
         public void Memorize() {
             Memory = Min();
         }
+        public new bool ContainsKey(LineSegmentInt lS) {
+            lS.UpdateManhattanMag(EyePos);
+            return base.ContainsKey(lS);
+        }
         public new void Add(LineSegmentInt lS, bool b) {
             lS.UpdateManhattanMag(EyePos);
+            // GD.PrintS(lS);
             base.Add(lS, b);
         }
         public void Initialize(
@@ -25,12 +43,19 @@ public class Vision {
             Dictionary<PointInt, Connections> edges
         ) {
             foreach (PointInt p in points) {
-                int y = (int) Math.Floor(EyePos.Y);
-                if (p.IntY == y) {
+                int x = (int) Math.Ceiling(EyePos.X);
+                int y = (int) Math.Ceiling(EyePos.Y);
+                if (p.IntY == y && p.IntX < x) {
                     if (edges[p][0, 1]) {
-                        Add(new LineSegmentInt(
-                            p, new PointInt(p.IntX, p.IntY + 1)
-                        ), true);
+                        LineSegmentInt lineSeg = new LineSegmentInt(
+                            p, new PointInt(p.IntX, p.IntY - 1)
+                        );
+                        // GD.Print();
+                        // GD.PrintS("Adding", lineSeg);
+                        // GD.PrintS("Into", this);
+                        // GD.PrintS("Comparisons {");
+                        Add(lineSeg, true);
+                        // GD.PrintS("}");
                     }
                 }
             }
@@ -152,13 +177,19 @@ public class Vision {
                                 point.IntY + y
                             )
                         );
+                        // GD.PrintS("ContainsKey");
+                        // GD.PrintS(rBTree);
+                        // GD.PrintS(lineSeg);
+                        // GD.PrintS(rBTree.ContainsKey(lineSeg));
                         if (rBTree.ContainsKey(lineSeg)) {
                             rBTree.Remove(lineSeg);
                             if (isVertexSeen) {
                                 deltaSeenEdges --;
                             }
                         } else {
+                            // GD.PrintS("adding...");
                             rBTree.Add(lineSeg, true);
+                            // GD.PrintS("added.");
                             if (isVertexSeen) {
                                 deltaSeenEdges ++;
                             }

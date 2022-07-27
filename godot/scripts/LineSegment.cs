@@ -1,3 +1,4 @@
+using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -23,16 +24,33 @@ public class LineSegment : IComparable {
     public double Length {
         get; protected set;
     }
+    public double Reduce {
+        get; protected set;
+    }
 
-    public LineSegment(Point start, Point end) {
-        Start = start;
-        End   = end;
-        double dx = end.X - start.X;
-        double dy = end.Y - start.Y;
+    public LineSegment(Point one, Point another) {
+        if (one.CompareTo(another) < 0) {
+            Start = one;
+            End   = another;
+        } else {
+            Start = another;
+            End   = one;
+        }
+        double dx = End.X - Start.X;
+        double dy = End.Y - Start.Y;
         Vector = new Point(dx, dy);
         Slope = dy / dx;
         Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
-        Intercept = start.Y - start.X * Slope;
+        Intercept = Start.Y - Start.X * Slope;
+        Reduce = (
+            + Start.X 
+            + Start.Y * IRRATIONAL_0
+            + End  .X * IRRATIONAL_1
+            + End  .Y * IRRATIONAL_2
+        );     
+    }
+    public override string ToString() {
+        return $"LineSeg[{Start} - {End} L1={ManhattanMag}]";
     }
     public void UpdateManhattanMag(Point EyePos) {
         ManhattanMag = (
@@ -44,24 +62,39 @@ public class LineSegment : IComparable {
             ) * .5)
         );
     }
+    protected static readonly double IRRATIONAL_0 = Math.Sqrt(2);
+    protected static readonly double IRRATIONAL_1 = Math.Sqrt(3);
+    protected static readonly double IRRATIONAL_2 = Math.Sqrt(5);
     int IComparable.CompareTo(object obj) {
         if (obj is LineSegment other) {
-            return ManhattanMag.CompareTo(other.ManhattanMag);
+            // GD.PrintS(" ", this, "vs", other);
+            if (Equals(other)) {
+                // GD.PrintS("  Equal");
+                // GD.PrintS(" ", this, "==", other);
+                return 0;
+            }
+            int sign = ManhattanMag.CompareTo(other.ManhattanMag);
+            // GD.PrintS(" ", sign);
+            if (sign == 0) {
+                // GD.PrintS(" L1 is both", ManhattanMag);
+                return Reduce.CompareTo(other.Reduce);
+            } else {
+                return sign;
+            }
         } else {
             throw new ArgumentException();
         }
     }
+    public bool Equals(LineSegment that) {
+        return (
+            Start.Equals(that.Start) &&
+            End  .Equals(that.End  ) ||
+            Start.Equals(that.End  ) &&
+            End  .Equals(that.Start)
+        );
+    }
     public override bool Equals(object obj) {
-        if (obj is LineSegment other) {
-            return (
-                Start.Equals(other.Start) &&
-                End  .Equals(other.End  ) ||
-                Start.Equals(other.End  ) &&
-                End  .Equals(other.Start)
-            );
-        } else {
-            return false;
-        }
+        return false;
     }
     public override int GetHashCode() {
         return Start.GetHashCode() ^ End.GetHashCode();
