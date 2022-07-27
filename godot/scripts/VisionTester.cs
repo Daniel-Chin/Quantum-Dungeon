@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class VisionTester : GamePlay {
     Map TheReal;
+    DebugCanvas DebugCanvas;
     public VisionTester(Main main): base(main) {
+        DebugCanvas = main.GetNode<DebugCanvas>("DebugCanvas");
         Reset();
     }
     public override void Reset() {
@@ -18,6 +20,13 @@ public class VisionTester : GamePlay {
                 } else {
                     tile = Tile.PATH;
                 }
+                if (
+                    i == -10 ||
+                    j == -10 ||
+                    i == 9   ||
+                    j == 9  
+                )
+                    tile = Tile.WALL;
                 TheReal[new PointInt(i, j)] = tile; 
             }
         }
@@ -31,6 +40,8 @@ public class VisionTester : GamePlay {
             TheReal, GameState.PlayerPos
         );
         MyMain.MyDisplay.DrawPolygon(vertices);
+        DebugCanvas.CachedVertices = vertices;
+        DebugCanvas.Update();
         GameState.TheSeen.Clear();
         foreach (KeyValuePair<PointInt, EnumClass> entry in TheReal) {
             GameState.TheSeen[entry.Key] = entry.Value;
@@ -52,8 +63,8 @@ public class VisionTester : GamePlay {
     protected void TestPolygon() {
         List<Point> vertices = new List<Point>();
         vertices.Add(new Point(1, 2));
-        vertices.Add(new Point(-1, 2));
         vertices.Add(new Point(0, 0));
+        vertices.Add(new Point(-1, 2));
         MyMain.MyDisplay.DrawPolygon(vertices);
     }
 }

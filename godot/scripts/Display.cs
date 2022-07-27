@@ -38,11 +38,14 @@ public class Display {
             );
         }
     }
+    public static Vector2 Coord2Pixel(Point coord) {
+        return new Vector2(
+            (float) (coord.X * C.CELL_SIZE), 
+            (float) (coord.Y * C.CELL_SIZE)
+        );
+    }
     public void DrawPolygon(List<Point> vertices) {
         GD.PrintS(string.Join( ", ", vertices));
-        Polygon.Polygon = vertices.Select(p => new Vector2(
-            (float) (p.X * C.CELL_SIZE), 
-            (float) (p.Y * C.CELL_SIZE)
-        )).ToArray();
+        Polygon.Polygon = vertices.Select(Coord2Pixel).ToArray();
     }
 }

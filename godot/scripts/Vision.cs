@@ -115,19 +115,15 @@ public class Vision {
             }
         }
     }
-    protected class PointPolar : IComparable {
+    protected class PointPolar : IComparable<PointPolar> {
         public PointInt ThePoint;
         public double Phase;
         public double Manhattan;
-        int IComparable.CompareTo(object obj) {
-            if (obj is PointPolar other) {
-                if (Math.Abs(Phase - other.Phase) < double.Epsilon) {
-                    return Manhattan.CompareTo(other.Manhattan);
-                } else {
-                    return Phase    .CompareTo(other.Phase);
-                }
+        int IComparable<PointPolar>.CompareTo(PointPolar that) {
+            if (Math.Abs(Phase - that.Phase) < double.Epsilon) {
+                return Manhattan.CompareTo(that.Manhattan);
             } else {
-                throw new ArgumentException();
+                return Phase    .CompareTo(that.Phase);
             }
         }
     }
@@ -164,8 +160,8 @@ public class Vision {
         foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
             if (
-                rBTree.Count == 0 || 
-                point.ManhattanMag() - 1 < rBTree.Min().ManhattanMag
+                point.ManhattanMag() - 1 
+                < rBTree.Min().ManhattanMag
             ) {
                 isVertexSeen = true;
                 rBTree.Memorize();
