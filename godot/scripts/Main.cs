@@ -1,8 +1,8 @@
 using Godot;
 
 public class Main : Node2D {
-    GamePlay Game;
-    Display MyDisplay;
+    protected GamePlay Game;
+    public Display MyDisplay;
     public override void _Ready() {
         MyDisplay = new Display(this);
         Game = new VisionTester(this);
@@ -12,10 +12,6 @@ public class Main : Node2D {
 
     public void Reset() {
         Game.Reset();
-        Draw();
-    }
-    public void Draw() {
-        MyDisplay.Draw();
     }
 
     public override void _UnhandledInput(InputEvent @event)

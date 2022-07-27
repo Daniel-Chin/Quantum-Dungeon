@@ -47,4 +47,8 @@ public class PointInt : Point {
     public override int GetHashCode() {
         return base.GetHashCode();
     }
+    public void Deconstruct(out int x, out int y) {
+        x = IntX;
+        y = IntY;
+    }
 }

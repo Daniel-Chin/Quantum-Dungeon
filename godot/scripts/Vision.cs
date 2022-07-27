@@ -109,18 +109,19 @@ public class Vision {
     protected static IEnumerable<PointInt> SortByOrientation(
         HashSet<PointInt> points, Point eyePos
     ) {
-        List<PointPolar> list = new List<PointPolar>();
+        PointPolar[] array = new PointPolar[points.Count];
+        int i = 0;
         foreach (PointInt p in points) {
             double dY = p.Y - eyePos.Y;
             double dX = p.X - eyePos.X;
-            list.Add(new PointPolar() {
+            array[i ++] = new PointPolar() {
                 ThePoint = p, 
                 Phase = Math.Atan2(dY, dX), 
                 Manhattan = Math.Abs(dX) + Math.Abs(dY),
-            });
+            };
         }
-        list.Sort();
-        return list.Select(x => x.ThePoint);
+        Array.Sort(array);
+        return array.Select(x => x.ThePoint);
     }
     public static List<Point> GetVertices(
         Map map, PointInt playerPos

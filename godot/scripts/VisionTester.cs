@@ -23,16 +23,15 @@ public class VisionTester : GamePlay {
         }
         GameState.TheSeen = TheReal.Clone();
     }
-    public void See(
-    ) {
+    public override void See() {
         GD.Print("VT See");
+        List<Point> vertices = Vision.GetVertices(
+            TheReal, GameState.PlayerPos
+        );
+        MyMain.MyDisplay.DrawPolygon(vertices);
         GameState.TheSeen.Clear();
-        Dictionary<
-            PointInt, bool
-        > isSeen = Vision.See(GameState.PlayerPos, TheReal);
-        foreach (KeyValuePair<PointInt, bool> entry in isSeen) {
-            Vision.Assert(entry.Value);
-            GameState.TheSeen[entry.Key] = TheReal[entry.Key];
+        foreach (KeyValuePair<PointInt, EnumClass> entry in TheReal) {
+            GameState.TheSeen[entry.Key] = entry.Value;
         }
     }
 
@@ -40,12 +39,12 @@ public class VisionTester : GamePlay {
         var (pX, pY) = GameState.PlayerPos;
         pX += x;
         pY += y;
-        if (TheReal[pX, pY].DoesBlock()) {
+        if (((Tile) TheReal[pX, pY]).DoesBlock()) {
             GD.Print("Hitting a doesBlock.");
         } else {
             GameState.PlayerPos = new PointInt(pX, pY);
             See();
-            MyMain.Draw();
+            MyMain.MyDisplay.DrawTileMaps();
         }
     }
 }
