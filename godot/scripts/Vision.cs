@@ -163,36 +163,46 @@ public class Vision {
         rBTree.Initialize(sortedGridPoints, edges);
         foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
-            if (point.ManhattanMag() - 1 < rBTree.Min().ManhattanMag) {
+            if (
+                rBTree.Count == 0 || 
+                point.ManhattanMag() - 1 < rBTree.Min().ManhattanMag
+            ) {
                 isVertexSeen = true;
                 rBTree.Memorize();
             }
             int deltaSeenEdges = 0;
-            for (int x = -1; x <= 1; x += 2) {
-                for (int y = -1; y <= 1; y += 2) {
-                    if (edges[point][x, y]) {
-                        LineSegmentInt lineSeg = new LineSegmentInt(
-                            point, new PointInt(
-                                point.IntX + x, 
-                                point.IntY + y
-                            )
-                        );
-                        // GD.PrintS("ContainsKey");
-                        // GD.PrintS(rBTree);
-                        // GD.PrintS(lineSeg);
-                        // GD.PrintS(rBTree.ContainsKey(lineSeg));
-                        if (rBTree.ContainsKey(lineSeg)) {
-                            rBTree.Remove(lineSeg);
-                            if (isVertexSeen) {
-                                deltaSeenEdges --;
-                            }
-                        } else {
-                            // GD.PrintS("adding...");
-                            rBTree.Add(lineSeg, true);
-                            // GD.PrintS("added.");
-                            if (isVertexSeen) {
-                                deltaSeenEdges ++;
-                            }
+            for (int i = 0; i < 4; i ++) {
+                int x;
+                int y;
+                switch (i) {
+                    case 0: x = -1; y =  0; break;
+                    case 1: x =  0; y = -1; break;
+                    case 2: x = +1; y =  0; break;
+                    case 3: x =  0; y = +1; break;
+                    default: throw new Exception("Impo");
+                }
+                if (edges[point][x, y]) {
+                    LineSegmentInt lineSeg = new LineSegmentInt(
+                        point, new PointInt(
+                            point.IntX + x, 
+                            point.IntY + y
+                        )
+                    );
+                    // GD.PrintS("ContainsKey");
+                    // GD.PrintS(rBTree);
+                    // GD.PrintS(lineSeg);
+                    // GD.PrintS(rBTree.ContainsKey(lineSeg));
+                    if (rBTree.ContainsKey(lineSeg)) {
+                        rBTree.Remove(lineSeg);
+                        if (isVertexSeen) {
+                            deltaSeenEdges --;
+                        }
+                    } else {
+                        // GD.PrintS("adding...");
+                        rBTree.Add(lineSeg, true);
+                        // GD.PrintS("added.");
+                        if (isVertexSeen) {
+                            deltaSeenEdges ++;
                         }
                     }
                 }

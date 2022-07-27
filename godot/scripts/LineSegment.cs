@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class LineSegment : IComparable {
+public class LineSegment : IComparable<LineSegment> {
     public Point Start {
         get; protected set;
     }
@@ -29,7 +29,7 @@ public class LineSegment : IComparable {
     }
 
     public LineSegment(Point one, Point another) {
-        if (one.CompareTo(another) < 0) {
+        if (one.LessThan(another)) {
             Start = one;
             End   = another;
         } else {
@@ -65,24 +65,20 @@ public class LineSegment : IComparable {
     protected static readonly double IRRATIONAL_0 = Math.Sqrt(2);
     protected static readonly double IRRATIONAL_1 = Math.Sqrt(3);
     protected static readonly double IRRATIONAL_2 = Math.Sqrt(5);
-    int IComparable.CompareTo(object obj) {
-        if (obj is LineSegment other) {
-            // GD.PrintS(" ", this, "vs", other);
-            if (Equals(other)) {
-                // GD.PrintS("  Equal");
-                // GD.PrintS(" ", this, "==", other);
-                return 0;
-            }
-            int sign = ManhattanMag.CompareTo(other.ManhattanMag);
-            // GD.PrintS(" ", sign);
-            if (sign == 0) {
-                // GD.PrintS(" L1 is both", ManhattanMag);
-                return Reduce.CompareTo(other.Reduce);
-            } else {
-                return sign;
-            }
+    int IComparable<LineSegment>.CompareTo(LineSegment that) {
+        // GD.PrintS(" ", this, "vs", that);
+        if (Equals(that)) {
+            // GD.PrintS("  Equal");
+            // GD.PrintS(" ", this, "==", that);
+            return 0;
+        }
+        int sign = ManhattanMag.CompareTo(that.ManhattanMag);
+        // GD.PrintS(" ", sign);
+        if (sign == 0) {
+            // GD.PrintS(" L1 is both", ManhattanMag);
+            return Reduce.CompareTo(that.Reduce);
         } else {
-            throw new ArgumentException();
+            return sign;
         }
     }
     public bool Equals(LineSegment that) {

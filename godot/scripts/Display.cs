@@ -39,8 +39,10 @@ public class Display {
         }
     }
     public void DrawPolygon(List<Point> vertices) {
+        GD.PrintS(string.Join( ", ", vertices));
         Polygon.Polygon = vertices.Select(p => new Vector2(
-            (float) p.X, (float) p.Y
+            (float) (p.X * C.CELL_SIZE), 
+            (float) (p.Y * C.CELL_SIZE)
         )).ToArray();
     }
 }

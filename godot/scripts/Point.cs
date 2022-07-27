@@ -1,5 +1,5 @@
 using System;
-public class Point : IComparable {
+public class Point : IComparable<Point> {
     public static readonly double EPS = 1e-7;
     public static readonly double THIRD_INVERSE_EPS;
     static Point() {
@@ -18,24 +18,23 @@ public class Point : IComparable {
     public override string ToString() {
         return $"({X}, {Y})";
     }
-    public int CompareTo(object obj) {
-        if (obj is Point other) {
-            if (this.X == other.X) {
-                if (this.Y == other.Y) {
-                    return 0;
-                } else if (this.Y < other.Y) {
-                    return -1;
-                } else {
-                    return +1;
-                }
-            } else if (this.X < other.X) {
+    int IComparable<Point>.CompareTo(Point that) {
+        if (this.X == that.X) {
+            if (this.Y == that.Y) {
+                return 0;
+            } else if (this.Y < that.Y) {
                 return -1;
             } else {
                 return +1;
             }
+        } else if (this.X < that.X) {
+            return -1;
         } else {
-            throw new ArgumentException();
+            return +1;
         }
+    }
+    public bool LessThan(Point that) {
+        return ((IComparable<Point>) this).CompareTo(that) < 0;
     }
     public override bool Equals(object obj) {
         if (obj is Point other) {

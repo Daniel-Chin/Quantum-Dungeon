@@ -23,6 +23,7 @@ public class VisionTester : GamePlay {
         }
         GameState.TheSeen = TheReal.Clone();
         MyMain.MyDisplay.DrawTileMaps();
+        TestPolygon();
     }
     public override void See() {
         GD.Print("VT See");
@@ -47,5 +48,12 @@ public class VisionTester : GamePlay {
             See();
             MyMain.MyDisplay.DrawTileMaps();
         }
+    }
+    protected void TestPolygon() {
+        List<Point> vertices = new List<Point>();
+        vertices.Add(new Point(1, 2));
+        vertices.Add(new Point(-1, 2));
+        vertices.Add(new Point(0, 0));
+        MyMain.MyDisplay.DrawPolygon(vertices);
     }
 }
