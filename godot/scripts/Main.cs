@@ -19,6 +19,12 @@ public class Main : Node2D {
         if (@event is InputEventKey eventKey) {
             if (
                 eventKey.Pressed && 
+                eventKey.Scancode == (int) KeyList.K
+            ) {
+                ((VisionTester) Game).OnK();
+            }
+            if (
+                eventKey.Pressed && 
                 eventKey.Scancode == (int) KeyList.Escape
             ) {
                 GetTree().Quit();

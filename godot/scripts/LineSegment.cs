@@ -179,7 +179,7 @@ public class LineSegment : IComparable<LineSegment> {
     }
     protected Tuple<double, double, double> ABC() {
         double A = End.Y - Start.Y;
-        double B = End.X - Start.X;
+        double B = Start.X - End.X;
         double C = A * Start.X + B * Start.Y;
         return new Tuple<double, double, double>(A, B, C);
     }

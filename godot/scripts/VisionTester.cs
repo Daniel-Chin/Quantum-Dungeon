@@ -35,12 +35,11 @@ public class VisionTester : GamePlay {
         TestPolygon();
     }
     public override void See() {
-        GD.Print("VT See");
+        // GD.Print("VT See");
         List<Point> vertices = Vision.GetVertices(
             TheReal, GameState.PlayerPos
         );
         MyMain.MyDisplay.DrawPolygon(vertices);
-        DebugCanvas.CachedVertices = vertices;
         DebugCanvas.Update();
         GameState.TheSeen.Clear();
         foreach (KeyValuePair<PointInt, EnumClass> entry in TheReal) {
@@ -66,5 +65,10 @@ public class VisionTester : GamePlay {
         vertices.Add(new Point(0, 0));
         vertices.Add(new Point(-1, 2));
         MyMain.MyDisplay.DrawPolygon(vertices);
+    }
+    public void OnK() {
+        Vision.DEBUG_I ++;
+        See();
+        DebugCanvas.Self.Update();
     }
 }

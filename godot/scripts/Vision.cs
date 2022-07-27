@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq;
 
 public class Vision {
-    class RBTree : SortedDictionary<LineSegmentInt, bool> {
+    public class RBTree : SortedDictionary<LineSegmentInt, bool> {
         protected Point EyePos;
         public LineSegmentInt Memory {
             get; protected set;
@@ -46,7 +46,7 @@ public class Vision {
                 int x = (int) Math.Ceiling(EyePos.X);
                 int y = (int) Math.Ceiling(EyePos.Y);
                 if (p.IntY == y && p.IntX < x) {
-                    if (edges[p][0, 1]) {
+                    if (edges[p][0, -1]) {
                         LineSegmentInt lineSeg = new LineSegmentInt(
                             p, new PointInt(p.IntX, p.IntY - 1)
                         );
@@ -61,11 +61,11 @@ public class Vision {
             }
         }
     }
-    protected class Connections {
-        bool XPos;
-        bool YPos;
-        bool XNeg;
-        bool YNeg;
+    public class Connections {
+        public bool XPos;
+        public bool YPos;
+        public bool XNeg;
+        public bool YNeg;
         public bool this[int x, int y] {
             get {
                 if (x == -1) return XNeg;
@@ -101,8 +101,8 @@ public class Vision {
                                 p00.IntX + dx, p00.IntY + dy
                             );
                             points.Add(corner);
-                            int dirX = dx * 2 - 1;
-                            int dirY = dy * 2 - 1;
+                            int dirX = 1 - dx * 2;
+                            int dirY = 1 - dy * 2;
                             if (! edges.ContainsKey(corner)) {
                                 edges.Add(corner, new Connections());
                             }
@@ -146,6 +146,7 @@ public class Vision {
         Array.Sort(array);
         return array.Select(x => x.ThePoint);
     }
+    public static int DEBUG_I = 0;
     public static List<Point> GetVertices(
         Map map, PointInt playerPos
     ) {
@@ -155,12 +156,19 @@ public class Vision {
         HashSet<PointInt> gridPoints = new HashSet<PointInt>();
         Dictionary<PointInt, Connections> edges = new Dictionary<PointInt, Connections>();
         MapToGraph(map, gridPoints, edges);
-        // DebugCanvas.Self.CachedVertices = gridPoints.Select(x => (Point)x).ToList();
+        // DebugCanvas.Self.GridPoints = gridPoints;
+        // DebugCanvas.Self.Edges      = edges;
+        // DebugCanvas.Self.PolygonVerts = gridPoints.Select(x => (Point)x).ToList();
         IEnumerable<PointInt> sortedGridPoints = SortByOrientation(
             gridPoints, eyePos
         );
-        // DebugCanvas.Self.CachedVertices = sortedGridPoints.Select(x => (Point)x).ToList();
+        // DebugCanvas.Self.PolygonVerts = sortedGridPoints.Select(x => (Point)x).ToList();
         rBTree.Initialize(sortedGridPoints, edges);
+        DebugCanvas.Self.MyRBTree = rBTree;
+        DebugCanvas.Self.PolygonVerts = vertices;
+        if (DEBUG_I == 0)
+            return new List<Point>();
+        int debugI = 0;
         foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
             if (
@@ -208,6 +216,7 @@ public class Vision {
                 }
             }
             if (isVertexSeen) {
+                if (DEBUG_I == ++ debugI) return new List<Point>();
                 if (deltaSeenEdges == 0) {
                     vertices.Add(point);
                 } else {
