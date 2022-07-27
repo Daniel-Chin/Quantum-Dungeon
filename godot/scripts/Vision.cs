@@ -25,9 +25,13 @@ public class Vision {
             Dictionary<PointInt, Connections> edges
         ) {
             foreach (PointInt p in points) {
-                int y = (int) Math.Ceiling(EyePos.Y);
+                int y = (int) Math.Floor(EyePos.Y);
                 if (p.IntY == y) {
-
+                    if (edges[p][0, 1]) {
+                        Add(new LineSegmentInt(
+                            p, new PointInt(p.IntX, p.IntY + 1)
+                        ), true);
+                    }
                 }
             }
         }
