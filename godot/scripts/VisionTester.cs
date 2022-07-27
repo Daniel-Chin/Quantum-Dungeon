@@ -18,7 +18,7 @@ public class VisionTester : GamePlay {
                 } else {
                     tile = Tile.PATH;
                 }
-                TheReal[Tuple.Create(i, j)] = tile; 
+                TheReal[new PointInt(i, j)] = tile; 
             }
         }
         GameState.TheSeen = TheReal.Clone();
@@ -28,9 +28,9 @@ public class VisionTester : GamePlay {
         GD.Print("VT See");
         GameState.TheSeen.Clear();
         Dictionary<
-            Tuple<int, int>, bool
+            PointInt, bool
         > isSeen = Vision.See(GameState.PlayerPos, TheReal);
-        foreach (KeyValuePair<Tuple<int, int>, bool> entry in isSeen) {
+        foreach (KeyValuePair<PointInt, bool> entry in isSeen) {
             Vision.Assert(entry.Value);
             GameState.TheSeen[entry.Key] = TheReal[entry.Key];
         }
@@ -43,7 +43,7 @@ public class VisionTester : GamePlay {
         if (TheReal[pX, pY].DoesBlock()) {
             GD.Print("Hitting a doesBlock.");
         } else {
-            GameState.PlayerPos = new Tuple<int, int>(pX, pY);
+            GameState.PlayerPos = new PointInt(pX, pY);
             See();
             MyMain.Draw();
         }

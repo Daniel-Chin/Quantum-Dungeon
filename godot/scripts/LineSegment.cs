@@ -34,15 +34,17 @@ public class LineSegment : IComparable {
         Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
         Intercept = start.Y - start.X * Slope;
     }
-    public void UpdateManhattanMag(Point playerPos) {
+    public void UpdateManhattanMag(Point EyePos) {
         ManhattanMag = (
-            + Math.Abs(2 * (Start.IntX - playerPos.IntX) - 1)
-            + Math.Abs(2 * (End  .IntX - playerPos.IntX) - 1)
-            + Math.Abs(2 * (Start.IntY - playerPos.IntY) - 1)
-            + Math.Abs(2 * (End  .IntY - playerPos.IntY) - 1)
-        ) * .25;
+            Math.Abs((
+                Start.X + End.X - 2 * EyePos.X
+            ) * .5) + 
+            Math.Abs((
+                Start.Y + End.Y - 2 * EyePos.Y
+            ) * .5)
+        );
     }
-    public int CompareTo(object obj) {
+    int IComparable.CompareTo(object obj) {
         if (obj is LineSegment other) {
             return ManhattanMag.CompareTo(other.ManhattanMag);
         } else {
@@ -66,7 +68,7 @@ public class LineSegment : IComparable {
     }
 
     public void Rasterize(
-        Dictionary<Tuple<int, int>, bool> output
+        Dictionary<PointInt, bool> output
     ) {
         double inverseSlope = 1 / Slope;
         int xSign = Math.Sign(Vector.X);
@@ -82,7 +84,7 @@ public class LineSegment : IComparable {
         double residualX = Start.X - cellX;
         double residualY = Start.Y - cellY;
         while (true) {
-            output[new Tuple<int, int>(cellX, cellY)] = true;
+            output[new PointInt(cellX, cellY)] = true;
             {
                 double x = cellX + residualX;
                 double y = cellY + residualY;
@@ -151,5 +153,12 @@ public class LineSegment : IComparable {
         double B = End.X - Start.X;
         double C = A * Start.X + B * Start.Y;
         return new Tuple<double, double, double>(A, B, C);
+    }
+}
+
+public class LineSegmentInt : LineSegment{
+    public LineSegmentInt(
+        PointInt start, PointInt end
+    ) : base(start, end) {
     }
 }

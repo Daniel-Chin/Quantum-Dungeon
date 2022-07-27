@@ -3,22 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class Vision {
-    class RBTree : SortedDictionary<LineSegment, bool> {
-        protected Point PlayerPos;
-        public LineSegment Memory {
+    class RBTree : SortedDictionary<LineSegmentInt, bool> {
+        protected Point EyePos;
+        public LineSegmentInt Memory {
             get; protected set;
         }
-        public LineSegment Min() => Keys.First();
-        public LineSegment Max() => Keys.Last();
-        public RBTree(Point playerPos) {
-            PlayerPos = playerPos;
+        public LineSegmentInt Min() => Keys.First();
+        public LineSegmentInt Max() => Keys.Last();
+        public RBTree(Point eyePos) {
+            EyePos = eyePos;
         }
         public void Memorize() {
             Memory = Min();
         }
-        public new void Add(LineSegment lS, bool b) {
-            lS.UpdateManhattanMag(PlayerPos);
+        public new void Add(LineSegmentInt lS, bool b) {
+            lS.UpdateManhattanMag(EyePos);
             base.Add(lS, b);
+        }
+        public void Initialize(
+            IEnumerable<PointInt> points, 
+            Dictionary<PointInt, Connections> edges
+        ) {
+            foreach (PointInt p in points) {
+                int y = (int) Math.Ceiling(EyePos.Y);
+                if (p.IntY == y) {
+
+                }
+            }
         }
     }
     protected class Connections {
@@ -48,17 +59,17 @@ public class Vision {
         }
     }
     protected static void MapToGraph(
-        Map map, HashSet<Point> points, 
-        Dictionary<Point, Connections> edges
+        Map map, HashSet<PointInt> points, 
+        Dictionary<PointInt, Connections> edges
     ) {
-        foreach (KeyValuePair<Point, EnumClass> cell in map) {
+        foreach (KeyValuePair<PointInt, EnumClass> cell in map) {
             if (cell.Value is Tile tile) {
                 if (tile.DoesBlock()) {
-                    Point p00 = cell.Key;
+                    PointInt p00 = cell.Key;
                     for (int dx = -1; dx <= 1; dx += 2) {
                         for (int dy = -1; dy <= 1; dy += 2) {
-                            Point corner = new Point(
-                                p00.X + dx, p00.Y + dy
+                            PointInt corner = new PointInt(
+                                p00.IntX + dx, p00.IntY + dy
                             );
                             points.Add(corner);
                             if (! edges.ContainsKey(corner)) {
@@ -76,10 +87,10 @@ public class Vision {
         }
     }
     protected class PointPolar : IComparable {
-        public Point ThePoint;
+        public PointInt ThePoint;
         public double Phase;
         public double Manhattan;
-        public int CompareTo(object obj) {
+        int IComparable.CompareTo(object obj) {
             if (obj is PointPolar other) {
                 if (Math.Abs(Phase - other.Phase) < double.Epsilon) {
                     return Manhattan.CompareTo(other.Manhattan);
@@ -91,14 +102,13 @@ public class Vision {
             }
         }
     }
-    protected static IEnumerable<Point> SortByOrientation(
-        HashSet<Point> points, Point playerPos
+    protected static IEnumerable<PointInt> SortByOrientation(
+        HashSet<PointInt> points, Point eyePos
     ) {
-        Point eye = playerPos.Offset05();
         List<PointPolar> list = new List<PointPolar>();
-        foreach (Point p in points) {
-            double dY = p.Y - eye.Y;
-            double dX = p.X - eye.X;
+        foreach (PointInt p in points) {
+            double dY = p.Y - eyePos.Y;
+            double dX = p.X - eyePos.X;
             list.Add(new PointPolar() {
                 ThePoint = p, 
                 Phase = Math.Atan2(dY, dX), 
@@ -109,18 +119,19 @@ public class Vision {
         return list.Select(x => x.ThePoint);
     }
     public static List<Point> GetVertices(
-        Map map, Point playerPos
+        Map map, PointInt playerPos
     ) {
+        Point eyePos = playerPos.Offset05();
         List<Point> vertices = new List<Point>();
-        RBTree rBTree = new RBTree(playerPos);
-        HashSet<Point> gridPoints = new HashSet<Point>();
-        Dictionary<Point, Connections> edges = new Dictionary<Point, Connections>();
+        RBTree rBTree = new RBTree(eyePos);
+        HashSet<PointInt> gridPoints = new HashSet<PointInt>();
+        Dictionary<PointInt, Connections> edges = new Dictionary<PointInt, Connections>();
         MapToGraph(map, gridPoints, edges);
-        IEnumerable<Point> sortedGridPoints = SortByOrientation(
-            gridPoints, playerPos
+        IEnumerable<PointInt> sortedGridPoints = SortByOrientation(
+            gridPoints, eyePos
         );
-        // Missing init condition
-        foreach (Point point in sortedGridPoints) {
+        rBTree.Initialize(sortedGridPoints, edges);
+        foreach (PointInt point in sortedGridPoints) {
             bool isVertexSeen = false;
             if (point.ManhattanMag() - 1 < rBTree.Min().ManhattanMag) {
                 isVertexSeen = true;
@@ -130,10 +141,10 @@ public class Vision {
             for (int x = -1; x <= 1; x += 2) {
                 for (int y = -1; y <= 1; y += 2) {
                     if (edges[point][x, y]) {
-                        LineSegment lineSeg = new LineSegment(
-                            point, new Point(
-                                point.X + x, 
-                                point.Y + y
+                        LineSegmentInt lineSeg = new LineSegmentInt(
+                            point, new PointInt(
+                                point.IntX + x, 
+                                point.IntY + y
                             )
                         );
                         if (rBTree.ContainsKey(lineSeg)) {

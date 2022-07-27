@@ -25,11 +25,14 @@ class Display {
     ) {
         tileMap.Clear();
         foreach (
-            KeyValuePair<Tuple<int, int>, EnumClass> 
+            KeyValuePair<PointInt, EnumClass> 
             cell in map
         ) {
-            var (x, y) = cell.Key;
-            tileMap.SetCell(x, y, (int) cell.Value.Id);
+            tileMap.SetCell(
+                cell.Key.IntX, 
+                cell.Key.IntY, 
+                (int) cell.Value.Id
+            );
         }
     }
 }
