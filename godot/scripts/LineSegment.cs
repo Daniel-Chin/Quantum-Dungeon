@@ -8,7 +8,7 @@ public class LineSegment : IComparable {
     public Point End {
         get; protected set;
     }
-    public int FourManhattanMag {
+    public double ManhattanMag {
         get; protected set;
     }
     public Point Vector {
@@ -35,16 +35,16 @@ public class LineSegment : IComparable {
         Intercept = start.Y - start.X * Slope;
     }
     public void UpdateManhattanMag(Point playerPos) {
-        FourManhattanMag = (
+        ManhattanMag = (
             + Math.Abs(2 * (Start.IntX - playerPos.IntX) - 1)
             + Math.Abs(2 * (End  .IntX - playerPos.IntX) - 1)
             + Math.Abs(2 * (Start.IntY - playerPos.IntY) - 1)
             + Math.Abs(2 * (End  .IntY - playerPos.IntY) - 1)
-        );
+        ) * .25;
     }
     public int CompareTo(object obj) {
         if (obj is LineSegment other) {
-            return FourManhattanMag.CompareTo(other.FourManhattanMag);
+            return ManhattanMag.CompareTo(other.ManhattanMag);
         } else {
             throw new ArgumentException();
         }

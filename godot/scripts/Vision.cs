@@ -4,13 +4,21 @@ using System.Linq;
 
 public class Vision {
     class RBTree : SortedDictionary<LineSegment, bool> {
+        protected Point PlayerPos;
         public LineSegment Memory {
             get; protected set;
         }
         public LineSegment Min() => Keys.First();
         public LineSegment Max() => Keys.Last();
+        public RBTree(Point playerPos) {
+            PlayerPos = playerPos;
+        }
         public void Memorize() {
             Memory = Min();
+        }
+        public new void Add(LineSegment lS, bool b) {
+            lS.UpdateManhattanMag(PlayerPos);
+            base.Add(lS, b);
         }
     }
     protected class Connections {
@@ -104,7 +112,7 @@ public class Vision {
         Map map, Point playerPos
     ) {
         List<Point> vertices = new List<Point>();
-        RBTree rBTree = new RBTree();
+        RBTree rBTree = new RBTree(playerPos);
         HashSet<Point> gridPoints = new HashSet<Point>();
         Dictionary<Point, Connections> edges = new Dictionary<Point, Connections>();
         MapToGraph(map, gridPoints, edges);
@@ -113,9 +121,12 @@ public class Vision {
         );
         // Missing init condition
         foreach (Point point in sortedGridPoints) {
-            int deltaSeenEdges = 0;
             bool isVertexSeen = false;
-            rBTree.Memorize();
+            if (point.ManhattanMag() - 1 < rBTree.Min().ManhattanMag) {
+                isVertexSeen = true;
+                rBTree.Memorize();
+            }
+            int deltaSeenEdges = 0;
             for (int x = -1; x <= 1; x += 2) {
                 for (int y = -1; y <= 1; y += 2) {
                     if (edges[point][x, y]) {
@@ -126,16 +137,13 @@ public class Vision {
                             )
                         );
                         if (rBTree.ContainsKey(lineSeg)) {
-                            if (lineSeg == rBTree.Min()) {
-                                isVertexSeen = true;
+                            rBTree.Remove(lineSeg);
+                            if (isVertexSeen) {
                                 deltaSeenEdges --;
                             }
-                            rBTree.Remove(lineSeg);
                         } else {
-                            lineSeg.UpdateManhattanMag(playerPos);
                             rBTree.Add(lineSeg, true);
-                            if (lineSeg == rBTree.Min()) {
-                                isVertexSeen = true;
+                            if (isVertexSeen) {
                                 deltaSeenEdges ++;
                             }
                         }
