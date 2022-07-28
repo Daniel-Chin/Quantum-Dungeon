@@ -13,4 +13,5 @@ public class GamePlay {
     public virtual void PlayerMove(int x, int y) {
         
     }
+    public virtual void Process(float dt) {}
 }

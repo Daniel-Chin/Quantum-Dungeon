@@ -3,97 +3,82 @@ using System;
 using System.Collections.Generic;
 class Raster {
     protected static double EpsToZero(double x) {
-        GD.PrintS(x);
+        // GD.PrintS(x);
         if (Math.Abs(x) < Double.Epsilon) {
             return 0;
         }
         return x;
     }
+    public static PosNegMatrix BoundAndMatrix(List<Point> vertices) {
+        int xStart = int.MaxValue; 
+        int yStart = int.MaxValue; 
+        int xEnd   = int.MinValue; 
+        int yEnd   = int.MinValue;    
+        foreach (Point p in vertices) {
+            xStart = (int) Math.Min(xStart, Math.Floor  (p.X));
+            yStart = (int) Math.Min(yStart, Math.Floor  (p.Y));
+            xEnd   = (int) Math.Max(xEnd  , Math.Ceiling(p.X));
+            yEnd   = (int) Math.Max(yEnd  , Math.Ceiling(p.Y));
+        }
+        // GD.PrintS(
+        //     xStart, 
+        //     yStart, 
+        //     xEnd, 
+        //     yEnd 
+        // );
+        return new PosNegMatrix(
+            xStart - 1,
+            yStart - 1,
+            xEnd   + 1,
+            yEnd   + 1
+        );
+    }
     public static void LineSeg(
         LineSegment lSeg, 
-        Dictionary<PointInt, bool> output
+        PosNegMatrix output
     ) {
         Point Start = lSeg.Start;
         Point End   = lSeg.End;
+        int xSign = Math.Sign(lSeg.Vector.X);
         double Slope = lSeg.Slope;
-        double inverseSlope = 1 / Slope;
-        Point Vector = lSeg.Vector;
-        double Length = lSeg.Length;
-        double Intercept = lSeg.Intercept;
-        int xSign = Math.Sign(Vector.X);
-        int ySign = Math.Sign(Vector.Y);
 
-        if (xSign == 0 && ySign == 0)
-            return;
-        Point UnitVector = new Point(
-            Vector.X / Length, 
-            Vector.Y / Length
-        );
-        int cellX = (int) Math.Floor(Start.X);
-        int cellY = (int) Math.Floor(Start.Y);
-        double residualX = Start.X - cellX;
-        double residualY = Start.Y - cellY;
-        while (true) {
-            output[new PointInt(cellX, cellY)] = true;
-            {
-                double x = cellX + residualX;
-                double y = cellY + residualY;
-                x -= End.X;
-                y -= End.Y;
-                if (x * Vector.X + y * Vector.Y >= 0)
-                    break;
+        GD.PrintS(lSeg, Slope);
+        if (Math.Abs(Slope) < 1) {
+            double YIntercept = Start.Y - Start.X * Slope;
+            int xMin = (int) Math.Ceiling(Math.Min(Start.X, End.X));
+            int xMax = (int) Math.Floor  (Math.Max(Start.X, End.X));
+            for (int x = xMin; x <= xMax; x ++) {
+                double y = x * Slope + YIntercept;
+                int intY = (int) Math.Floor(y);
+                output[x - 1, intY] = true;
+                output[x    , intY] = true;
+                if (Math.Abs(y - intY) < double.Epsilon) {
+                    output[x - 1, intY - 1] = true;
+                    output[x    , intY - 1] = true;
+                }
             }
-            double armX = UnitVector.X * 2;
-            double armY = UnitVector.Y * 2;
-            double handX = residualX + armX;
-            double handY = residualY + armY;
-            int sign_00 = Math.Sign(EpsToZero(
-                armY * 0 - handX - armX * 0 - handY
-            ));
-            int sign_01 = Math.Sign(EpsToZero(
-                armY * 0 - handX - armX * 1 - handY
-            ));
-            int sign_10 = Math.Sign(EpsToZero(
-                armY * 1 - handX - armX * 0 - handY
-            ));
-            int sign_11 = Math.Sign(EpsToZero(
-                armY * 1 - handX - armX * 1 - handY
-            ));
-            // GD.PrintS(sign_00, sign_01, sign_10, sign_11);
-            int moveX = 0;
-            int moveY = 0;
-            if      (sign_00 < sign_01) 
-                moveX = -1;
-            else if (sign_01 < sign_11) 
-                moveY = +1;
-            else if (sign_11 < sign_10) 
-                moveX = +1;
-            else if (sign_10 < sign_00) 
-                moveY = -1;
-            else 
-                throw new Exception("ghe9p8hret534");
-            cellX += moveX;
-            cellY += moveY;
-            if (moveX != 0) {
-                residualX = 0;
-                residualY = (
-                    cellX * Slope + Intercept - cellY
-                );
-            } else {
-                residualY = 0;
-                if (xSign != 0) {
-                    residualX = (
-                        cellY - Intercept
-                    ) * inverseSlope - cellX;
+        } else {
+            double inverseSlope = lSeg.Vector.X / lSeg.Vector.Y;
+            double XIntercept = Start.X - Start.Y * inverseSlope;
+            int yMin = (int) Math.Ceiling(Math.Min(Start.Y, End.Y));
+            int yMax = (int) Math.Floor  (Math.Max(Start.Y, End.Y));
+            for (int y = yMin; y <= yMax; y ++) {
+                double x = y * inverseSlope + XIntercept;
+                int intX = (int) Math.Floor(x);
+                output[intX, y - 1] = true;
+                output[intX, y    ] = true;
+                if (Math.Abs(x - intX) < double.Epsilon) {
+                    output[intX - 1, y - 1] = true;
+                    output[intX - 1, y    ] = true;
                 }
             }
         }
     }
-    public static void RasterOnlyEdges(
-        List<Point> vertices, 
-        Dictionary<PointInt, bool> output
+    public static PosNegMatrix RasterOnlyEdges(
+        List<Point> vertices
     ) {
         // Debug only. Does not even close the loop.
+        PosNegMatrix output = BoundAndMatrix(vertices);
         Point last = null;
         foreach (Point p in vertices) {
             if (last != null) {
@@ -102,5 +87,6 @@ class Raster {
             }
             last = p;
         }
+        return output;
     }
 }

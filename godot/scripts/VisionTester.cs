@@ -43,13 +43,11 @@ public class VisionTester : GamePlay {
         );
         MyMain.MyDisplay.DrawPolygon(vertices);
         DebugCanvas.Update();
+
         GameState.TheSeen.Clear();
-        Dictionary<PointInt, bool> IsSeen = new Dictionary<PointInt, bool>();
-        Raster.RasterOnlyEdges(vertices, IsSeen);
-        foreach (KeyValuePair<PointInt, bool> entry in IsSeen) {
-            if (entry.Value) {
-                GameState.TheSeen[entry.Key] = TheReal[entry.Key];
-            }
+        PosNegMatrix IsSeen = Raster.RasterOnlyEdges(vertices);
+        foreach (PointInt p in IsSeen.WhereTrues()) {
+            GameState.TheSeen[p] = TheReal[p];
         }
     }
 
@@ -76,5 +74,27 @@ public class VisionTester : GamePlay {
         // Vision.DEBUG_I ++;
         // See();
         // DebugCanvas.Self.Update();
+    }
+    public override void Process(float dt) {
+    }
+    void DebugRasterLineSeg() {
+        GameState.TheSeen.Clear();
+        PosNegMatrix IsSeen = new PosNegMatrix(-99, -99, 99, 99);
+        Vector2 v = MyMain.MyDisplay.SeenTileMap.GetLocalMousePosition();
+        // v = MyMain.MyDisplay.SeenTileMap.WorldToMap(
+            // MyMain.MyDisplay.SeenTileMap.ToLocal(
+                // v
+            // )
+        // );
+        v = v / C.CELL_SIZE;
+        // GD.PrintS(v);
+        Raster.LineSeg(new LineSegment(
+            new Point(0.5, 0.5), 
+            new Point(v.x, v.y)
+        ), IsSeen);
+        foreach (PointInt p in IsSeen.WhereTrues()) {
+            GameState.TheSeen[p] = TheReal[p];
+        }
+        MyMain.MyDisplay.DrawTileMaps();
     }
 }

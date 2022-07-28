@@ -11,6 +11,9 @@ public class Main : Node2D {
 
         Reset();
     }
+    public override void _Process(float dt) {
+        Game.Process(dt);
+    }
 
     public void Reset() {
         Game.Reset();

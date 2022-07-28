@@ -18,9 +18,6 @@ public class LineSegment : IComparable<LineSegment> {
     public double Slope {
         get; protected set;
     }
-    public double Intercept {
-        get; protected set;
-    }
     public double Length {
         get; protected set;
     }
@@ -41,7 +38,6 @@ public class LineSegment : IComparable<LineSegment> {
         Vector = new Point(dx, dy);
         Slope = dy / dx;
         Length = Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2));
-        Intercept = Start.Y - Start.X * Slope;
         Reduce = (
             + Start.X 
             + Start.Y * IRRATIONAL_0
