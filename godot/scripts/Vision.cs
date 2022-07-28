@@ -91,29 +91,27 @@ public class Vision {
         Map map, HashSet<PointInt> points, 
         Dictionary<PointInt, Connections> edges
     ) {
+        map.WrapWithUnknown();
         foreach (KeyValuePair<PointInt, EnumClass> cell in map) {
-            if (cell.Value is Tile tile) {
-                if (tile.DoesBlockVision()) {
-                    PointInt p00 = cell.Key;
-                    for (int dx = 0; dx < 2; dx ++) {
-                        for (int dy = 0; dy < 2; dy ++) {
-                            PointInt corner = new PointInt(
-                                p00.IntX + dx, p00.IntY + dy
-                            );
-                            points.Add(corner);
-                            int dirX = 1 - dx * 2;
-                            int dirY = 1 - dy * 2;
-                            if (! edges.ContainsKey(corner)) {
-                                edges.Add(corner, new Connections());
-                            }
-                            Connections connections = edges[corner];
-                            connections[dirX, 0] = ! connections[dirX, 0];
-                            connections[0, dirY] = ! connections[0, dirY];
+            Tile tile = (Tile) cell.Value;
+            if (tile.DoesBlockVision()) {
+                PointInt p00 = cell.Key;
+                for (int dx = 0; dx < 2; dx ++) {
+                    for (int dy = 0; dy < 2; dy ++) {
+                        PointInt corner = new PointInt(
+                            p00.IntX + dx, p00.IntY + dy
+                        );
+                        points.Add(corner);
+                        int dirX = 1 - dx * 2;
+                        int dirY = 1 - dy * 2;
+                        if (! edges.ContainsKey(corner)) {
+                            edges.Add(corner, new Connections());
                         }
+                        Connections connections = edges[corner];
+                        connections[dirX, 0] = ! connections[dirX, 0];
+                        connections[0, dirY] = ! connections[0, dirY];
                     }
                 }
-            } else {
-                throw new Exception("9g835h4");
             }
         }
     }

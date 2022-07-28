@@ -33,6 +33,7 @@ public class GamePlay {
     public virtual void Process(float dt) {}
     public virtual void See() {
         Map draft = GameState.TheSeen.Clone();
+        GD.PrintS(draft);
         Point eyePos = GameState.PlayerPos.Offset05();
         List<Point> vertices;
         while (true) {
@@ -83,7 +84,7 @@ public class GamePlay {
         for (int x = isSeen.XStart; x < isSeen.XEnd; x ++) {
             for (int y = isSeen.YStart; y < isSeen.YEnd; y ++) {
                 if (! isSeen[x, y]) {
-                    map[x, y] = Tile.UNKNOWN;
+                    map.Remove(new PointInt(x, y));
                 }
             }
         }
@@ -128,7 +129,8 @@ public class GamePlay {
                 }
             }
         } else {
-            // generate path
+            // generate path or maybe corner wall
+            new Assert(false);
         }
     }
 }

@@ -12,6 +12,8 @@ Quantum
             accept?
             try to avoid?
 
+floor tile is diff for a room, so generation knows. 
+
 Story
     First, you have an item, reality scrambler. 
         Using it will consume heat, but scrambles dungeon. 
