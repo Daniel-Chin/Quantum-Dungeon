@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 public class GamePlay {
     protected Main MyMain;
     public GamePlay(Main main) {
@@ -24,8 +25,8 @@ public class GamePlay {
                 return;
             }
         }
-        if (theSeen[GameState.PlayerPos] == Tile.DOOR_SHUT) {
-            theSeen[GameState.PlayerPos] = Tile.DOOR_OPEN;
+        if (theSeen[GameState.PlayerPos] == Tile.DOOR_OPEN) {
+            theSeen[GameState.PlayerPos] = Tile.DOOR_SHUT;
         }
         GameState.PlayerPos = new PointInt(pX, pY);
         See();
@@ -81,13 +82,19 @@ public class GamePlay {
         return result;
     }
     protected void CleanUnseen(Map map, PosNegMatrix isSeen) {
-        for (int x = isSeen.XStart; x < isSeen.XEnd; x ++) {
-            for (int y = isSeen.YStart; y < isSeen.YEnd; y ++) {
-                if (! isSeen[x, y]) {
-                    map.Remove(new PointInt(x, y));
-                }
+        List<PointInt> todo = new List<PointInt>();
+        foreach (PointInt p in map.Keys) {
+            bool toClean = false;
+            try {
+                toClean = ! isSeen[p.IntX, p.IntY];
+            } catch (IndexOutOfRangeException) {
+                toClean = true;
+            }
+            if (toClean) {
+                todo.Add(p);
             }
         }
+        todo.ForEach(p => map.Remove(p));
     }
     protected void Generate(
         PointInt origin, Map draft, PointInt playerPos
@@ -130,7 +137,7 @@ public class GamePlay {
             }
         } else {
             // generate path or maybe corner wall
-            new Assert(false);
+            draft[origin] = Tile.WALL;
         }
     }
 }
