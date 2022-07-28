@@ -12,7 +12,7 @@ public class Display {
         SeenTileMap = main.GetNode<TileMap>("SeenTileMap");
         OldTileMap  = main.GetNode<TileMap>("OldTileMap");
         FolkTileMap = main.GetNode<TileMap>("FolkTileMap");
-        OldTileMap.Modulate = new Color(100, 100, 100);
+        OldTileMap.Modulate = new Color(0, 50, 100);
         Polygon = main.GetNode<Polygon2D>("Polygon");
     }
     public void DrawTileMaps() {
