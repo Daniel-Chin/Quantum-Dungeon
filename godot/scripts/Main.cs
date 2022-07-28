@@ -6,9 +6,7 @@ public class Main : Node2D {
     public override void _Ready() {
         MyDisplay = new Display(this);
         Game = new VisionTester(
-            this, 
-            GetNode<ViewportContainer>("RasterPreview")
-            .GetNode<Rasterizor>("Rasterizor")
+            this
         );
 
         Reset();

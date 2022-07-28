@@ -1,9 +1,7 @@
 public class GamePlay {
     protected Main MyMain;
-    protected Rasterizor Raster;
-    public GamePlay(Main main, Rasterizor raster) {
+    public GamePlay(Main main) {
         MyMain = main;
-        Raster = raster;
     }
     public virtual void Reset() {
         GameState.Reset();
