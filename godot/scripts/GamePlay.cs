@@ -30,6 +30,7 @@ public class GamePlay {
         }
         GameState.PlayerPos = new PointInt(pX, pY);
         See();
+        MyMain.MyDisplay.CameraFollow();
     }
     public virtual void Process(float dt) {}
     public virtual void See() {
@@ -67,6 +68,12 @@ public class GamePlay {
             }
         }
         GameState.TheSeen = draft;
+        foreach (PointInt p in draft.Keys) {
+            if (! GameState.TheOld.ContainsKey(p)) {
+                GameState.TheOld.Add(p, Tile.UNKNOWN);
+            }
+            GameState.TheOld[p] = draft[p];
+        }
         MyMain.MyDisplay.DrawTileMaps();
         MyMain.MyDisplay.DrawPolygon(vertices);
     }

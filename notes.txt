@@ -2,6 +2,7 @@
 - 但是每回合都会根据现有视野重新生成！包括道具，敌人。  
 - 门开两次之后变成墙。  
 - 开局就有目的地, food, 和宝物的视野，你需要多次尝试让走廊连过去。  
+- Enemies can spawn at the boundary of your vision. 
 
 Quantum
     if standing at door and adjacent is invisible,

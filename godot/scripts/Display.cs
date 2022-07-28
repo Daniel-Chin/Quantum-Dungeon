@@ -8,12 +8,14 @@ public class Display {
     public TileMap OldTileMap;
     public TileMap FolkTileMap;
     public Polygon2D Polygon;
+    public Camera2D MainCamera;
     public Display(Main main) {
         SeenTileMap = main.GetNode<TileMap>("SeenTileMap");
         OldTileMap  = main.GetNode<TileMap>("OldTileMap");
         FolkTileMap = main.GetNode<TileMap>("FolkTileMap");
-        OldTileMap.Modulate = new Color(0, 50, 100);
+        OldTileMap.Modulate = new Color(0, .1f, .5f);
         Polygon = main.GetNode<Polygon2D>("Polygon");
+        MainCamera = main.GetNode<Camera2D>("MainCamera");
     }
     public void DrawTileMaps() {
         DrawOneTileMap(SeenTileMap, GameState.TheSeen);
@@ -57,5 +59,12 @@ public class Display {
         // }
         // GD.PrintS();
         Polygon.Polygon = vertices.Select(Coord2Pixel).ToArray();
+    }
+    public void CameraFollow() {
+        var (x, y) = GameState.PlayerPos;
+        MainCamera.Position = new Vector2(
+            x * C.CELL_SIZE, 
+            y * C.CELL_SIZE
+        );
     }
 }
