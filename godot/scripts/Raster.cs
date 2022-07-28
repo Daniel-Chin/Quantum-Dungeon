@@ -42,7 +42,7 @@ class Raster {
         int xSign = Math.Sign(lSeg.Vector.X);
         double Slope = lSeg.Slope;
 
-        GD.PrintS(lSeg, Slope);
+        // GD.PrintS(lSeg, Slope);
         if (Math.Abs(Slope) < 1) {
             double YIntercept = Start.Y - Start.X * Slope;
             int xMin = (int) Math.Ceiling(Math.Min(Start.X, End.X));
@@ -86,6 +86,41 @@ class Raster {
                 LineSeg(lSeg, output);
             }
             last = p;
+        }
+        return output;
+    }
+    public static PosNegMatrix Main(
+        List<Point> vertices, Point eye
+    ) {
+        PosNegMatrix output = BoundAndMatrix(vertices);
+        PosNegMatrix[] radiations = new PosNegMatrix[vertices.Count];
+        {
+            int i = 0;
+            foreach (Point p in vertices) {
+                PosNegMatrix pnM = output.Birth();
+                LineSeg(new LineSegment(
+                    eye, p
+                ), pnM);
+                radiations[i ++] = pnM;
+            }
+        }
+        ;
+        foreach (
+            Tuple<Tuple<Point, PosNegMatrix>, Tuple<Point, PosNegMatrix>> pair in 
+            SelfPairUp<Tuple<Point, PosNegMatrix>>.Main(
+                Zip<Point, PosNegMatrix>.Main(vertices, radiations)
+            )
+        ) {
+            Tuple<Point, PosNegMatrix> prev = pair.Item1;
+            Tuple<Point, PosNegMatrix> next = pair.Item2;
+            PosNegMatrix triangle = output.Birth();
+            triangle.InplaceOr(prev.Item2);
+            triangle.InplaceOr(next.Item2);
+            LineSeg(new LineSegment(
+                prev.Item1, next.Item1
+            ), triangle);
+            FillTriangle(triangle);
+            output.InplaceOr(triangle);
         }
         return output;
     }
