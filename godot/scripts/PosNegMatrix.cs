@@ -4,10 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 class PosNegMatrix {
     // Matrix where indices can be negative. 
-    protected int XStart; 
-    protected int XEnd; 
-    protected int YStart; 
-    protected int YEnd;    
+    public int XStart {
+        get; protected set;
+    }
+    public int XEnd {
+        get; protected set;
+    }
+    public int YStart {
+        get; protected set;
+    }
+    public int YEnd {
+        get; protected set;
+    }
     protected byte Exponent;
     protected BitArray Data;
     public PosNegMatrix(

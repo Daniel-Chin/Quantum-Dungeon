@@ -124,4 +124,25 @@ class Raster {
         }
         return output;
     }
+    protected static void FillTriangle(PosNegMatrix triangle) {
+        for (int x = triangle.XStart; x < triangle.XEnd; x ++) {
+            int yStart;
+            for (
+                yStart = triangle.YStart; 
+                yStart < triangle.YEnd; yStart ++
+            ) {
+                if (triangle[x, yStart]) break;
+            }
+            int yEnd;
+            for (
+                yEnd = triangle.YEnd - 1; 
+                yEnd >= yStart; yEnd --
+            ) {
+                if (triangle[x, yEnd]) break;
+            }
+            for (int y = yStart + 1; y < yEnd; y ++) {
+                triangle[x, y] = true;
+            }
+        }
+    }
 }
