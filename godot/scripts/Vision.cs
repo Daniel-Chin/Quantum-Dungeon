@@ -249,7 +249,9 @@ public class Vision {
             );
             if (Math.Abs(phase - lastPhase) > double.Epsilon) {
                 if (lastPoint != null) {
-                    processed.Add(lastPoint);
+                    if (lastPoint != processed.Last()) {
+                        processed.Add(lastPoint);
+                    }
                     lastPoint = null;
                 }
                 processed.Add(p);
@@ -259,7 +261,9 @@ public class Vision {
             lastPhase = phase;
         }
         if (lastPoint != null) {
-            processed.Add(lastPoint);
+            if (lastPoint != processed.Last()) {
+                processed.Add(lastPoint);
+            }
         }
         return processed;
     }
