@@ -119,3 +119,4 @@ script = ExtResource( 3 )
 [node name="MainCamera" type="Camera2D" parent="."]
 current = true
 smoothing_enabled = true
+smoothing_speed = 0.2

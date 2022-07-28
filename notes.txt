@@ -14,6 +14,11 @@ Quantum
             try to avoid?
 
 floor tile is diff for a room, so generation knows. 
+ROoms of different "styles" can just have different floor tiles. the floor may share texture. 
+backrooms: Pillar matrix! 
+
+Telepathy: reveals enemies. 
+    this is bad! You can't use vision to "despawn" enemies any more!
 
 Story
     First, you have an item, reality scrambler. 
