@@ -45,6 +45,7 @@ public class VisionTester : GamePlay {
         DebugCanvas.Update();
         GameState.TheSeen.Clear();
         Dictionary<PointInt, bool> IsSeen = new Dictionary<PointInt, bool>();
+        Raster.RasterOnlyEdges(vertices, IsSeen);
         foreach (KeyValuePair<PointInt, bool> entry in IsSeen) {
             if (entry.Value) {
                 GameState.TheSeen[entry.Key] = TheReal[entry.Key];
