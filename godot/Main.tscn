@@ -81,8 +81,7 @@ cell_size = Vector2( 32, 32 )
 format = 1
 
 [node name="Polygon" type="Polygon2D" parent="."]
-color = Color( 0, 0, 0, 0.439216 )
-invert_enable = true
+color = Color( 1, 0.827451, 0, 0.360784 )
 invert_border = 1000.0
 
 [node name="DebugCanvas" type="Node2D" parent="."]

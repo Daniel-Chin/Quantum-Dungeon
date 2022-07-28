@@ -3,12 +3,10 @@ using System;
 using System.Collections.Generic;
 
 public class EnumClass {
-    public static readonly EnumClass UNKNOWN;
     public uint Id { get; private set; }
     private static HashSet<uint> AllId;
     static EnumClass() {
         AllId = new HashSet<uint>();
-        UNKNOWN = new EnumClass(0);
     }
 
     protected EnumClass(uint id) {

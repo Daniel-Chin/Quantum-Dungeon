@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-class PosNegMatrix {
+public class PosNegMatrix {
     // Matrix where indices can be negative. 
     public int XStart {
         get; protected set;

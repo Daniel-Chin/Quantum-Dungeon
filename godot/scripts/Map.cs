@@ -7,7 +7,7 @@ public class Map : Dictionary<PointInt, EnumClass> {
             try {
                 return base[location];
             } catch (KeyNotFoundException) {
-                return EnumClass.UNKNOWN;
+                return Tile.UNKNOWN;
             }
         }
         set {

@@ -5,7 +5,7 @@ public class Main : Node2D {
     public Display MyDisplay;
     public override void _Ready() {
         MyDisplay = new Display(this);
-        Game = new VisionTester(
+        Game = new GamePlay(
             this
         );
 
@@ -22,12 +22,12 @@ public class Main : Node2D {
     public override void _UnhandledInput(InputEvent @event)
     {
         if (@event is InputEventKey eventKey) {
-            if (
-                eventKey.Pressed && 
-                eventKey.Scancode == (int) KeyList.K
-            ) {
-                ((VisionTester) Game).OnK();
-            }
+            // if (
+            //     eventKey.Pressed && 
+            //     eventKey.Scancode == (int) KeyList.K
+            // ) {
+            //     ((VisionTester) Game).OnK();
+            // }
             if (
                 eventKey.Pressed && 
                 eventKey.Scancode == (int) KeyList.Escape

@@ -93,7 +93,7 @@ public class Vision {
     ) {
         foreach (KeyValuePair<PointInt, EnumClass> cell in map) {
             if (cell.Value is Tile tile) {
-                if (tile.DoesBlock()) {
+                if (tile.DoesBlockVision()) {
                     PointInt p00 = cell.Key;
                     for (int dx = 0; dx < 2; dx ++) {
                         for (int dy = 0; dy < 2; dy ++) {
@@ -148,9 +148,8 @@ public class Vision {
     }
     // public static int DEBUG_I = 0;
     public static List<Point> GetVertices(
-        Map map, PointInt playerPos
+        Map map, Point eyePos
     ) {
-        Point eyePos = playerPos.Offset05();
         List<Point> vertices = new List<Point>();
         RBTree rBTree = new RBTree(eyePos);
         HashSet<PointInt> gridPoints = new HashSet<PointInt>();
@@ -227,7 +226,7 @@ public class Vision {
                         backWall = rBTree.Min();
                     }
                     Point intersect = backWall.IntersectWith(new LineSegment(
-                        playerPos.Offset05(), point
+                        eyePos, point
                     ));
                     if (deltaSeenEdges == 2) {
                         vertices.Add(intersect);

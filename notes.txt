@@ -4,7 +4,7 @@
 - 开局就有目的地, food, 和宝物的视野，你需要多次尝试让走廊连过去。  
 
 Quantum
-    if standing at door and room is invisible,
+    if standing at door and adjacent is invisible,
         generate room
     extend from visible paths
         make up junctions and doors
