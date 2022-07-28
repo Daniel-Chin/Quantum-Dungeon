@@ -47,6 +47,19 @@ public class GamePlay {
                 CleanUnseen(draft, seenPNM);
                 break;
             }
+            // prioritize room generate, to avoid collision
+            Generate(GameState.PlayerPos + new PointInt(
+                1, 0
+            ), draft, GameState.PlayerPos);
+            Generate(GameState.PlayerPos + new PointInt(
+                0, 1
+            ), draft, GameState.PlayerPos);
+            Generate(GameState.PlayerPos + new PointInt(
+                -1, 0
+            ), draft, GameState.PlayerPos);
+            Generate(GameState.PlayerPos + new PointInt(
+                0, -1
+            ), draft, GameState.PlayerPos);
             foreach (PointInt origin in knownUnknowns) {
                 Generate(origin, draft, GameState.PlayerPos);
             }
@@ -79,5 +92,43 @@ public class GamePlay {
         PointInt origin, Map draft, PointInt playerPos
     ) {
         if (draft[origin] != Tile.UNKNOWN) return;
+        PointInt playerToOrigin = origin - playerPos;
+        if (
+            Math.Abs(playerToOrigin.IntX) + 
+            Math.Abs(playerToOrigin.IntY)
+            == 1 && draft[playerPos] == Tile.DOOR_OPEN
+        ) {
+            // generate room
+            PointInt baseI = playerToOrigin;
+            PointInt baseJ = playerToOrigin.Rotate90();
+            int radius = Global.random.Next() % 5 + 1;
+            for (int i = 0; i <= 2 * radius; i ++) {
+                for (int j = - radius; j <= radius; j ++) {
+                    PointInt target = origin + i * baseI + j * baseJ;
+                    new Assert(draft[target] == Tile.UNKNOWN);
+                    draft[target] = Tile.PATH;
+                }
+            }
+            for (int i = 0; i <= 2 * radius; i ++) {
+                for (int j = - radius; j <= radius; j += 2 * radius) {
+                    PointInt target = origin + i * baseI + j * baseJ;
+                    if (i % 2 == 0 && Global.random.Next() % 8 == 0) {
+                        draft[target] = Tile.DOOR_SHUT;
+                    } else {
+                        draft[target] = Tile.WALL;
+                    }
+                }
+            }
+            for (int j = - radius; j <= radius; j ++) {
+                PointInt target = origin + 2 * radius * baseI + j * baseJ;
+                if (j % 2 == 0 && Global.random.Next() % 8 == 0) {
+                    draft[target] = Tile.DOOR_SHUT;
+                } else {
+                    draft[target] = Tile.WALL;
+                }
+            }
+        } else {
+            // generate path
+        }
     }
 }

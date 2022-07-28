@@ -52,6 +52,15 @@ public class Point : IComparable<Point> {
     public double ManhattanMag(Point eye) {
         return Math.Abs(X - eye.X) + Math.Abs(Y - eye.Y);
     }
+    public static Point operator +(Point a, Point b) {
+        return new Point(a.X + b.X, a.Y + b.Y);
+    }
+    public static Point operator -(Point a) {
+        return new Point(- a.X, - a.Y);
+    }
+    public static Point operator -(Point a, Point b) {
+        return new Point(a.X - b.X, a.Y - b.Y);
+    }
 }
 
 public class PointInt : Point {
@@ -71,5 +80,23 @@ public class PointInt : Point {
     public void Deconstruct(out int x, out int y) {
         x = IntX;
         y = IntY;
+    }
+    public static PointInt operator +(PointInt a, PointInt b) {
+        return new PointInt(a.IntX + b.IntX, a.IntY + b.IntY);
+    }
+    public static PointInt operator -(PointInt a) {
+        return new PointInt(- a.IntX, - a.IntY);
+    }
+    public static PointInt operator -(PointInt a, PointInt b) {
+        return new PointInt(a.IntX - b.IntX, a.IntY - b.IntY);
+    }
+    public PointInt Rotate90() {
+        return new PointInt(- IntY, IntX);
+    }
+    public PointInt Rotate270() {
+        return new PointInt(IntY, - IntX);
+    }
+    public static PointInt operator *(int k, PointInt p) {
+        return new PointInt(k * p.IntX, k * p.IntY);
     }
 }
