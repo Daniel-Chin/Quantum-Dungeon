@@ -62,8 +62,8 @@ class PosNegMatrix {
     public PosNegMatrix Birth() {
         return new PosNegMatrix(
             XStart, 
-            XEnd, 
             YStart, 
+            XEnd, 
             YEnd
         );
     }

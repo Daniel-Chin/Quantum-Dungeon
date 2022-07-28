@@ -60,6 +60,7 @@ class Raster {
         } else {
             double inverseSlope = lSeg.Vector.X / lSeg.Vector.Y;
             double XIntercept = Start.X - Start.Y * inverseSlope;
+            // GD.PrintS(inverseSlope, XIntercept);
             int yMin = (int) Math.Ceiling(Math.Min(Start.Y, End.Y));
             int yMax = (int) Math.Floor  (Math.Max(Start.Y, End.Y));
             for (int y = yMin; y <= yMax; y ++) {
@@ -92,6 +93,7 @@ class Raster {
     public static PosNegMatrix Main(
         List<Point> vertices, Point eye
     ) {
+        // foreach (Point p in vertices) GD.PrintS(" ", p);
         PosNegMatrix output = BoundAndMatrix(vertices);
         PosNegMatrix[] radiations = new PosNegMatrix[vertices.Count];
         {

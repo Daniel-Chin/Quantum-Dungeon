@@ -10,6 +10,7 @@ class SelfPairUp<T> {
         bool isFirst = true;
         foreach (T x in e) {
             if (isFirst) {
+                isFirst = false;
                 first = x;
             } else {
                 yield return new Tuple<T, T>(prev, x);

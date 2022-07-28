@@ -45,7 +45,7 @@ public class VisionTester : GamePlay {
         DebugCanvas.Update();
 
         GameState.TheSeen.Clear();
-        PosNegMatrix IsSeen = Raster.RasterOnlyEdges(vertices);
+        PosNegMatrix IsSeen = Raster.Main(vertices, GameState.PlayerPos.Offset05());
         foreach (PointInt p in IsSeen.WhereTrues()) {
             GameState.TheSeen[p] = TheReal[p];
         }
