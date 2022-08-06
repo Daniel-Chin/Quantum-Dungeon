@@ -11,3 +11,14 @@ The outdoor area
     一块无限草坪。
     会刷出许多地牢走廊小 fragments, 大多数是直道或L型弯。
     偶尔刷出U型弯。可以用来回到地牢。
+
+彩虹旋转楼梯
+    房间。 中央柱子挡视野， 地砖彩虹色。 彩虹色周期为 6Pi. 玩家绕柱子转。
+
+BERT corridor
+    一行字与走廊平行。  
+    you walk forwards or backwards. 
+    text is generated as your vision area moves. 
+    if specific words appear, trasures appear with them. 
+    You can manipulate by walking forwards and backwards. 
+    Maybe even spawn splits, where two roads diverge. 
